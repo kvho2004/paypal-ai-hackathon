@@ -52,9 +52,12 @@ export async function fetchTransactions(
         const value = info.transactionAmount?.value;
         if (value === undefined || parseFloat(value) >= 0) continue;
 
+        // Seeded payouts carry the merchant name in the note; fall back to other fields.
+        // Which field PayPal populates depends on the transaction type, so verify with real data.
         const merchantRaw =
-          d.payerInfo?.payerName?.alternateFullName ??
+          info.transactionNote ??
           info.transactionSubject ??
+          d.payerInfo?.payerName?.alternateFullName ??
           d.payerInfo?.emailAddress ??
           "Unknown merchant";
 
