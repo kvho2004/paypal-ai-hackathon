@@ -1,0 +1,68 @@
+// Shared contract (dev.md section 9). Change only by PR.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                  String  @id
+  name                String
+  paypalSandboxEmail  String?
+  prefs               Json
+}
+
+model Program {
+  id       String @id
+  name     String
+  domain   String
+  earnRate Float
+}
+
+model Connection {
+  id           String @id
+  userId       String
+  programId    String
+  kernelAuthId String
+  status       String
+}
+
+model Balance {
+  id           String   @id
+  connectionId String
+  points       Int
+  rewards      Json
+  fetchedAt    DateTime
+  source       String
+}
+
+model Purchase {
+  id          String   @id
+  userId      String
+  paypalTxnId String   @unique
+  merchantRaw String
+  programId   String?
+  amountCents Int
+  at          DateTime
+}
+
+model CatalogItem {
+  id             String @id
+  programId      String
+  rewardName     String
+  menuPriceCents Int
+  pointCost      Int?
+}
+
+model Action {
+  id        String   @id
+  userId    String
+  type      String
+  payload   Json
+  status    String
+  createdAt DateTime
+}

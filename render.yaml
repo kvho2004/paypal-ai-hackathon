@@ -1,0 +1,56 @@
+# Render Blueprint: deploys the whole stack from this repo.
+# Secrets marked `sync: false` are entered once in the Render dashboard (never committed).
+databases:
+  - name: krumms-db
+    plan: free
+    databaseName: krumms
+
+services:
+  - type: web
+    name: krumms-web
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start
+    autoDeploy: true # auto-deploy main
+    envVars:
+      - key: NODE_VERSION
+        value: 20.19.5
+      - key: DATABASE_URL
+        fromDatabase:
+          name: krumms-db
+          property: connectionString
+      - key: PAYPAL_ENVIRONMENT
+        value: SANDBOX
+      - key: DEMO_MODE
+        value: "true"
+      - key: PAYPAL_CLIENT_ID
+        sync: false
+      - key: PAYPAL_CLIENT_SECRET
+        sync: false
+      - key: PAYPAL_WEBHOOK_ID
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: KERNEL_API_KEY
+        sync: false
+      - key: ZAPIER_HOOK_URL
+        sync: false
+      - key: APP_URL
+        sync: false
+
+  # TODO(Tue): enable once workers/refresh.ts exists (Kernel balance refresh queue consumer).
+  # - type: worker
+  #   name: krumms-worker
+  #   runtime: node
+  #   buildCommand: npm ci
+  #   startCommand: npx tsx workers/refresh.ts
+  #   envVars: (same DATABASE_URL / KERNEL_API_KEY / ANTHROPIC_API_KEY as web)
+
+  # TODO(Wed): enable once jobs/hourly.ts exists (refresh stale balances, alerts).
+  # - type: cron
+  #   name: krumms-hourly
+  #   runtime: node
+  #   schedule: "0 * * * *"
+  #   buildCommand: npm ci
+  #   startCommand: npx tsx jobs/hourly.ts
