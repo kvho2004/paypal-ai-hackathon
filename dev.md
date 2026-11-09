@@ -1,5 +1,9 @@
 # Krumms: Development Plan
 
+https://github.com/lagmanju
+https://github.com/alannaq
+https://github.com/kvho2004
+
 Food-rewards assistant for the PayPal AI Hackathon. One app, one AI agent, all your restaurant rewards.
 
 **Deadline:** Nov 12, 2026 @ 3:00 PM EST (about 3.5 build days from Nov 8 night)
