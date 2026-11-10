@@ -58,8 +58,9 @@ export async function fetchTransactions(
           info.transactionNote ??
           info.transactionSubject ??
           d.payerInfo?.payerName?.alternateFullName ??
-          d.payerInfo?.emailAddress ??
-          "Unknown merchant";
+          d.payerInfo?.emailAddress;
+        // No merchant info means a non-purchase line, e.g. a payout batch total (T1503).
+        if (!merchantRaw) continue;
 
         out.push({
           paypalTxnId: info.transactionId,
