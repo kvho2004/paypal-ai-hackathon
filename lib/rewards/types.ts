@@ -34,11 +34,21 @@ export const RewardItemSchema = z.object({
   expiresAt: z.iso.date().nullable().describe("YYYY-MM-DD, or null if not shown"),
 });
 
+export const OfferSchema = z.object({
+  name: z.string().trim().min(1).describe("Offer headline exactly as shown, e.g. \"$2 off any bowl\""),
+  details: z.string().trim().min(1).nullable().describe("Conditions or fine print as shown, or null if none"),
+  expiresAt: z.iso.date().nullable().describe("YYYY-MM-DD redeem-by date, or null if not shown"),
+});
+
+// refresh.ts saves everything except `points` in Balance.rewards (JSON): { rewards, offers, tierProgress }.
 export const ExtractedRewardsSchema = z.object({
   points: z.number().int().nonnegative().describe("Current points balance"),
   rewards: z
     .array(RewardItemSchema)
     .describe("Rewards redeemable with points, each with its point cost; empty if none. Not coupons or offers."),
+  offers: z
+    .array(OfferSchema)
+    .describe("Deals that don't cost points: discounts, coupons, bonus-point promos; empty if none."),
   tierProgress: z
     .object({
       tierName: z.string().trim().min(1),
@@ -50,6 +60,7 @@ export const ExtractedRewardsSchema = z.object({
 });
 
 export type RewardItem = z.infer<typeof RewardItemSchema>;
+export type Offer = z.infer<typeof OfferSchema>;
 export type ExtractedRewards = z.infer<typeof ExtractedRewardsSchema>;
 
 // Returned by refreshRewards(connectionId); used by the Render worker and the agent tool.
