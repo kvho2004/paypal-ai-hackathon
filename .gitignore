@@ -48,3 +48,6 @@ next-env.d.ts
 
 # development plans
 docs/plans/*.md
+
+# Kernel spike output (real account data)
+/.spike/

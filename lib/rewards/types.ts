@@ -36,7 +36,9 @@ export const RewardItemSchema = z.object({
 
 export const ExtractedRewardsSchema = z.object({
   points: z.number().int().nonnegative().describe("Current points balance"),
-  rewards: z.array(RewardItemSchema).describe("Rewards listed; empty if none"),
+  rewards: z
+    .array(RewardItemSchema)
+    .describe("Rewards redeemable with points, each with its point cost; empty if none. Not coupons or offers."),
   tierProgress: z
     .object({
       tierName: z.string().trim().min(1),
