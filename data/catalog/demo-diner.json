@@ -1,0 +1,21 @@
+{
+  "programId": "demo-diner",
+  "name": "Demo Diner",
+  "earnRate": 10,
+  "items": [
+    { "name": "Bottomless Drip Coffee", "menuPriceCents": 125, "pointCost": 150, "tags": ["drink", "breakfast", "vegetarian"] },
+    { "name": "Seasoned Fries", "menuPriceCents": 325, "pointCost": 250, "tags": ["side", "fried", "vegetarian"] },
+    { "name": "Pumpkin Pie Slice", "menuPriceCents": 395, "pointCost": 300, "tags": ["dessert", "vegetarian"] },
+    { "name": "Thick Milkshake", "menuPriceCents": 475, "pointCost": 350, "tags": ["drink", "dessert", "vegetarian"] },
+    { "name": "Buttermilk Pancake Stack", "menuPriceCents": 895, "pointCost": 450, "tags": ["breakfast", "vegetarian"] },
+    { "name": "Garden Grain Bowl", "menuPriceCents": 725, "pointCost": 650, "tags": ["lunch", "vegetarian", "healthy"] },
+    { "name": "Crispy Chicken Sandwich", "menuPriceCents": 950, "pointCost": 700, "tags": ["lunch", "fried"] },
+    { "name": "Diner Classic Burger", "menuPriceCents": 1050, "pointCost": 800, "tags": ["lunch", "burger"] },
+    { "name": "Blue Plate Special", "menuPriceCents": 1550, "pointCost": 1200, "tags": ["lunch"] },
+    { "name": "Turkey Avocado Wrap", "menuPriceCents": 750, "pointCost": null, "tags": ["lunch", "healthy"] },
+    { "name": "Tomato Soup & Grilled Roll", "menuPriceCents": 595, "pointCost": null, "tags": ["lunch", "vegetarian"] },
+    { "name": "Chicken Caesar Salad", "menuPriceCents": 795, "pointCost": null, "tags": ["lunch", "healthy"] },
+    { "name": "Diner Slider Duo", "menuPriceCents": 695, "pointCost": null, "tags": ["lunch", "burger"] },
+    { "name": "Fresh Lemonade", "menuPriceCents": 275, "pointCost": null, "tags": ["drink", "vegetarian"] }
+  ]
+}
