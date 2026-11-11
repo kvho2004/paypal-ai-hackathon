@@ -12,9 +12,9 @@
     { "name": "Crispy Chicken Sandwich", "menuPriceCents": 950, "pointCost": 700, "tags": ["lunch", "fried"] },
     { "name": "Diner Classic Burger", "menuPriceCents": 1050, "pointCost": 800, "tags": ["lunch", "burger"] },
     { "name": "Blue Plate Special", "menuPriceCents": 1550, "pointCost": 1200, "tags": ["lunch"] },
-    { "name": "Turkey Avocado Wrap", "menuPriceCents": 750, "pointCost": null, "tags": ["lunch", "healthy"] },
+    { "name": "Turkey Avocado Wrap", "menuPriceCents": 695, "pointCost": null, "tags": ["lunch", "healthy"] },
     { "name": "Tomato Soup & Grilled Roll", "menuPriceCents": 595, "pointCost": null, "tags": ["lunch", "vegetarian"] },
-    { "name": "Chicken Caesar Salad", "menuPriceCents": 795, "pointCost": null, "tags": ["lunch", "healthy"] },
+    { "name": "Chicken Caesar Salad", "menuPriceCents": 675, "pointCost": null, "tags": ["lunch", "healthy"] },
     { "name": "Diner Slider Duo", "menuPriceCents": 695, "pointCost": null, "tags": ["lunch", "burger"] },
     { "name": "Fresh Lemonade", "menuPriceCents": 275, "pointCost": null, "tags": ["drink", "vegetarian"] }
   ]
