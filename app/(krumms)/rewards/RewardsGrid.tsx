@@ -64,7 +64,14 @@ function PunchDots({ row }: { row: RewardRow }) {
   const ready = row.pointsNeeded === 0;
   const filled = ready ? DOTS : Math.min(DOTS - 1, Math.floor(row.progress * DOTS));
   return (
-    <div className="flex items-center gap-2" title={`${row.balance} of ${row.pointCost} points`}>
+    <div
+      className="flex items-center gap-2"
+      title={
+        row.pendingPoints > 0
+          ? `${row.balance} points plus ${row.pendingPoints} pending, of ${row.pointCost} needed`
+          : `${row.balance} of ${row.pointCost} points`
+      }
+    >
       <span className="flex gap-1" aria-hidden>
         {Array.from({ length: DOTS }, (_, i) => (
           <span
@@ -78,6 +85,11 @@ function PunchDots({ row }: { row: RewardRow }) {
       <span className={`text-xs ${ready ? "font-semibold text-success" : "text-muted"}`}>
         {ready ? "Ready!" : `${row.pointsNeeded} to go`}
       </span>
+      {row.pendingPoints > 0 && (
+        <span className="whitespace-nowrap rounded-full bg-accent/60 px-1.5 py-0.5 text-[10px] font-medium text-[#4a3700]">
+          +{row.pendingPoints} pending
+        </span>
+      )}
     </div>
   );
 }
