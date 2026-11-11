@@ -66,7 +66,7 @@ export const DEMO_ACCOUNTS: Account[] = [
     lifetimePoints: 1840,
     activity: [
       { date: "2026-11-06", description: "Order #4471 · $11.00", points: 110 },
-      { date: "2026-11-03", description: "Order #4398 · $8.25", points: 82 },
+      { date: "2026-11-04", description: "Order #4398 · $8.25", points: 82 },
       { date: "2026-10-29", description: "Order #4310 · $9.50", points: 95 },
       { date: "2026-10-21", description: "Redeemed Bottomless Drip Coffee", points: -150 },
       { date: "2026-10-14", description: "Order #4152 · $7.40", points: 74 },
