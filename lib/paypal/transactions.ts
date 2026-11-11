@@ -7,6 +7,19 @@ export interface NormalizedPurchase {
   programId: string | null;
   amountCents: number;
   at: Date;
+  /** The transaction this one refers to. For checkout payments it is the capture id we saved at capture time. */
+  referenceId?: string;
+  /** PayPal event code: "T0001" = seeded payout, "T0006" = checkout payment (docs/checkout.md). */
+  eventCode?: string;
+}
+
+/** Event codes seen in the student account's history. */
+export const EVENT_SEED_PAYOUT = "T0001";
+export const EVENT_CHECKOUT = "T0006";
+
+export interface FetchOptions {
+  /** Keep only these PayPal event codes (e.g. ["T0001"] for the seeded demo purchases). */
+  eventCodes?: string[];
 }
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -26,6 +39,7 @@ function toCents(value: string | undefined): number {
 export async function fetchTransactions(
   start: Date,
   end: Date,
+  options: FetchOptions = {},
 ): Promise<NormalizedPurchase[]> {
   const api = getTransactionSearch();
   const out: NormalizedPurchase[] = [];
@@ -52,13 +66,22 @@ export async function fetchTransactions(
         const value = info.transactionAmount?.value;
         if (value === undefined || parseFloat(value) >= 0) continue;
 
-        // Seeded payouts carry the merchant name in the note; fall back to other fields.
-        // Which field PayPal populates depends on the transaction type, so verify with real data.
+        const eventCode = info.transactionEventCode;
+        if (options.eventCodes && (!eventCode || !options.eventCodes.includes(eventCode))) continue;
+
+        // Merchant name depends on the transaction type (verified against real sandbox data):
+        // - seeded payouts (T0001) carry it in the note
+        // - checkout payments (T0006) carry the ITEM in the subject and the payee's business name
+        //   ("Test Store") as counterparty, so neither is usable. Every checkout in this app pays
+        //   Demo Diner, so label them directly.
+        // - anything else falls back to the other fields.
         const merchantRaw =
-          info.transactionNote ??
-          info.transactionSubject ??
-          d.payerInfo?.payerName?.alternateFullName ??
-          d.payerInfo?.emailAddress;
+          eventCode === EVENT_CHECKOUT
+            ? "Demo Diner"
+            : (info.transactionNote ??
+              info.transactionSubject ??
+              d.payerInfo?.payerName?.alternateFullName ??
+              d.payerInfo?.emailAddress);
         // No merchant info means a non-purchase line, e.g. a payout batch total (T1503).
         if (!merchantRaw) continue;
 
@@ -68,6 +91,8 @@ export async function fetchTransactions(
           programId: normalizeMerchant(merchantRaw),
           amountCents: toCents(value),
           at: new Date(info.transactionInitiationDate),
+          referenceId: info.paypalReferenceId,
+          eventCode,
         });
       }
       page += 1;
@@ -78,9 +103,9 @@ export async function fetchTransactions(
   return out;
 }
 
-export async function fetchRecentTransactions(days: number) {
+export async function fetchRecentTransactions(days: number, options: FetchOptions = {}) {
   const end = new Date();
-  return fetchTransactions(new Date(end.getTime() - days * DAY_MS), end);
+  return fetchTransactions(new Date(end.getTime() - days * DAY_MS), end, options);
 }
 
 export interface PurchaseSummaryRow {

@@ -67,6 +67,8 @@ export async function createPayPalOrder(input: CreateOrderInput): Promise<Create
             amount: { currencyCode: "USD", value: (amountCents / 100).toFixed(2) },
           },
         ],
+        // Name shown on the PayPal approval page. The sandbox account's own business name is "Test Store".
+        applicationContext: { brandName: "Demo Diner" },
       },
       prefer: "return=representation",
     })

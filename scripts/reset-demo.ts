@@ -1,13 +1,16 @@
 import "dotenv/config";
 import { db } from "../lib/db";
 import { DEMO_USER_ID, ingestFromPayPal } from "../lib/purchases";
+import { EVENT_SEED_PAYOUT } from "../lib/paypal/transactions";
 
 /**
  * Restore the demo user to the exact "before the demo" state, so every filming take
  * and every judge run starts identical:
  *   - demo user exists with empty preferences
  *   - rewards connections, balances and actions are cleared (so "connect rewards" can be shown live)
- *   - purchases are re-ingested from PayPal Transaction Search (the 12 seeded sandbox payments)
+ *   - purchases are re-ingested from PayPal Transaction Search, using ONLY the 12 seeded payouts (event
+ *     code T0001). Checkout payments made while testing or filming (T0006) are deliberately left out, so
+ *     the "before" state is identical every time and the meal you buy on camera is not already in it.
  *
  * Only rows belonging to the demo user are touched. Requires DEMO_MODE=true.
  *
@@ -58,7 +61,7 @@ async function main() {
     }),
   ]);
 
-  const ingest = await ingestFromPayPal(DEMO_USER_ID, 30);
+  const ingest = await ingestFromPayPal(DEMO_USER_ID, 30, { eventCodes: [EVENT_SEED_PAYOUT] });
   console.log("Re-ingested from PayPal:", ingest);
   console.log("After: ", await counts());
 }
