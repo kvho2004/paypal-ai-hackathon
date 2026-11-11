@@ -1,4 +1,5 @@
-import { DEMO_USER_ID, getPurchaseSummary } from "../../../lib/purchases";
+import { requireUser } from "../../../lib/auth/server";
+import { getPurchaseSummary } from "../../../lib/purchases";
 
 // Query at request time, never at build time (the database is not reachable for static prerendering).
 export const dynamic = "force-dynamic";
@@ -7,7 +8,8 @@ const usd = (cents: number) =>
   (cents / 100).toLocaleString("en-US", { style: "currency", currency: "USD" });
 
 export default async function PurchasesPage() {
-  const rows = await getPurchaseSummary(DEMO_USER_ID, 30);
+  const user = await requireUser();
+  const rows = await getPurchaseSummary(user.id, 30);
   const totalCents = rows.reduce((sum, r) => sum + r.totalCents, 0);
   const visits = rows.reduce((sum, r) => sum + r.visits, 0);
 

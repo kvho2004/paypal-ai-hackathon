@@ -12,6 +12,8 @@ datasource db {
 model User {
   id                  String  @id
   name                String
+  email               String? @unique // Krumms login; null for users that cannot sign in
+  passwordHash        String? // scrypt hash (lib/auth/password.ts), never the password
   paypalSandboxEmail  String?
   prefs               Json
 }

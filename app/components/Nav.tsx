@@ -10,8 +10,14 @@ const LINKS = [
   { href: "/connect", label: "Connect" },
 ];
 
-export default function Nav() {
+export default function Nav({ userName }: { userName?: string }) {
   const pathname = usePathname();
+
+  async function signOut() {
+    await fetch("/api/auth/logout", { method: "POST" });
+    window.location.href = "/login"; // full load, so no signed-in page stays cached in the router
+  }
+
   return (
     <header className="border-b border-black/10 dark:border-white/15">
       <nav className="mx-auto flex max-w-5xl items-center gap-6 px-6 py-4">
@@ -38,6 +44,18 @@ export default function Nav() {
             );
           })}
         </ul>
+        {userName && (
+          <div className="ml-auto flex items-center gap-3 text-sm">
+            <span className="opacity-70">{userName}</span>
+            <button
+              type="button"
+              onClick={signOut}
+              className="rounded border border-black/15 px-2 py-1 hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10"
+            >
+              Sign out
+            </button>
+          </div>
+        )}
       </nav>
     </header>
   );
