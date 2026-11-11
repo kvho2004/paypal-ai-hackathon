@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { DEMO_USER_ID } from "../../../lib/purchases";
+import { requireUser } from "../../../lib/auth/server";
 import { getRewardRows } from "../../../lib/views/rewards";
 import RewardsGrid from "./RewardsGrid";
 
@@ -7,7 +7,8 @@ import RewardsGrid from "./RewardsGrid";
 export const dynamic = "force-dynamic";
 
 export default async function RewardsPage() {
-  const rows = await getRewardRows(DEMO_USER_ID);
+  const user = await requireUser();
+  const rows = await getRewardRows(user.id);
   const programs = new Set(rows.map((r) => r.programId)).size;
   const ready = rows.filter((r) => r.pointsNeeded === 0).length;
 

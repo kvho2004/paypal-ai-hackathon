@@ -54,7 +54,6 @@ async function main() {
       create: {
         id: DEMO_USER_ID,
         name: "Demo Student",
-        paypalSandboxEmail: process.env.SEED_RECIPIENT_EMAIL ?? null,
         prefs: {},
       },
       update: { prefs: {} },

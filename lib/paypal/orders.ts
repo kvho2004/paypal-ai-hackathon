@@ -97,10 +97,13 @@ function completedCapture(order: Order) {
 }
 
 /**
- * Capture an approved order and record it as a Purchase for the demo user.
- * Safe to call twice: an already-captured order is read back and upserted by capture id.
+ * Capture an approved order and record it as a Purchase for `userId` (the signed-in student; scripts use the
+ * demo user). Safe to call twice: an already-captured order is read back and upserted by capture id.
  */
-export async function capturePayPalOrder(orderId: string): Promise<CapturedPurchase> {
+export async function capturePayPalOrder(
+  orderId: string,
+  userId: string = DEMO_USER_ID,
+): Promise<CapturedPurchase> {
   const orders = getMerchantOrders();
   let order: Order;
   try {
@@ -114,7 +117,7 @@ export async function capturePayPalOrder(orderId: string): Promise<CapturedPurch
   }
 
   const c = completedCapture(order);
-  await savePurchases(DEMO_USER_ID, [
+  await savePurchases(userId, [
     {
       paypalTxnId: c.paypalTxnId,
       merchantRaw: "Demo Diner",
