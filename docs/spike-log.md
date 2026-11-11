@@ -36,3 +36,11 @@ Can Kernel read a real restaurant rewards program? Each run of `scripts/spike-ke
 - 22:56 Q3 run 2/3: OK (www.panerabread.com/en-us/mypanera/rewards.html, 2082 chars)
 - 22:56 Q3 run 3/3: OK (www.panerabread.com/en-us/mypanera/rewards.html, 2082 chars)
 - verdict: **WORKS.** Screenshots show the logged-in MyPanera Rewards & Offers page in all 3 runs, with identical text each time: points balance, points expiry date, points needed for the next reward, and current offers with redeem-by dates. Unlike Chipotle, this page doesn't list rewards with point costs (that's behind "Explore Rewards"), so value-per-point scoring would need a second page or catalog data.
+
+## chipotle: repeat reads, 2026-11-10 ET
+Follow-up after building the adapter and `refresh.ts`: does a Chipotle login keep working for later reads?
+- Reads work right after a Kernel login (adapter test 3/3), but fail about 10 minutes later. Kernel still reports the connection as `AUTHENTICATED`, and the page doesn't redirect to a login page: the reward list just never renders.
+- Cause: Chipotle's bot protection (Kasada) blocks the account endpoint. On the failing page, `GET services.chipotle.com/customer/v2/customer` returns `429` with Kasada's challenge page as the body, while the menu and ordering-status calls on the same API server return `200`. The request still carries the login token, so the login itself is present; Kasada stops it before the login matters. A normal browser sends the same header names and gets `200`.
+- Tried, with Kernel's documented options only: saving profile changes after each read (`save_changes`) made no difference. Logging in and reading through a Kernel ISP proxy (one stable exit IP) made it worse: blocked even right after login.
+- Not tried, on purpose: editing Kasada's stored browser state to force a fresh handshake. That would mean working around the site's bot protection.
+- verdict: **WORKS ONLY RIGHT AFTER CONNECTING.** Fine for "connect, then read now"; not for background refreshes. `refresh.ts` reports these reads as `EXTRACT_FAILED` and saves nothing, so the app should offer a reconnect. Demo Diner remains the dependable demo path.
