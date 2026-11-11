@@ -1,10 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import ApprovalCard from "../chat/ApprovalCard";
 import type { ApprovalRequest, ApprovalResult, RankedPick } from "../chat/agentTypes";
 import RankedGrid from "../chat/RankedGrid";
+import ConnectFlow from "../connect/ConnectFlow";
 import type { RewardRow } from "../../../lib/views/rewards";
+import { makeConnectStub } from "./connectStub";
+
+type StubOutcome = "ok" | "extract-failed" | "needs-auth";
 
 // Sample data in the shape the agent will return. Not real recommendations.
 const SAMPLE_PICKS: RankedPick[] = [
@@ -47,6 +51,8 @@ const SAMPLE_PICKS: RankedPick[] = [
 export default function Preview({ clientId, rewardRows }: { clientId: string | null; rewardRows: RewardRow[] }) {
   const [request, setRequest] = useState<ApprovalRequest | null>(null);
   const [result, setResult] = useState<ApprovalResult | null>(null);
+  const [outcome, setOutcome] = useState<StubOutcome>("ok");
+  const connectStub = useMemo(() => makeConnectStub(outcome), [outcome]);
 
   return (
     <div className="space-y-10">
@@ -85,6 +91,26 @@ export default function Preview({ clientId, rewardRows }: { clientId: string | n
       <section>
         <h2 className="mb-3 font-display text-xl font-semibold text-brand-text">RankedGrid: reward rankings</h2>
         <RankedGrid rows={rewardRows} />
+      </section>
+
+      <section>
+        <h2 className="mb-1 font-display text-xl font-semibold text-brand-text">ConnectFlow (stubbed routes)</h2>
+        <p className="mb-3 text-sm text-muted">
+          Uses a fake of the connect routes, not Kernel. The numbers are sample values.
+        </p>
+        <label className="mb-3 block text-sm">
+          Stub ending:{" "}
+          <select
+            value={outcome}
+            onChange={(e) => setOutcome(e.target.value as StubOutcome)}
+            className="rounded border border-line bg-surface px-2 py-1"
+          >
+            <option value="ok">success</option>
+            <option value="extract-failed">read fails</option>
+            <option value="needs-auth">login not completed</option>
+          </select>
+        </label>
+        <ConnectFlow key={outcome} programId="demo-diner" programName="Demo Diner" api={connectStub} />
       </section>
     </div>
   );
