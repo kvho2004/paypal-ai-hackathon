@@ -45,7 +45,22 @@ export default async function PurchasesPage() {
           <p className="text-sm text-muted">No purchases yet.</p>
         </Card>
       ) : (
-        <Card className="overflow-x-auto p-0">
+        <Card className="p-0">
+          {/* Phones: a list, because four table columns do not fit in 393px. */}
+          <ul className="divide-y divide-line sm:hidden">
+            {rows.map((r) => (
+              <li key={r.merchant} className="flex items-center justify-between gap-3 px-4 py-3">
+                <div className="min-w-0">
+                  <p className="truncate font-medium">{displayName(r.merchant, r.programId)}</p>
+                  <p className="text-xs text-muted">
+                    {r.visits} {r.visits === 1 ? "visit" : "visits"} · {usd(r.totalCents)}
+                  </p>
+                </div>
+                {r.programId ? <Badge tone="brand">Member</Badge> : <Badge tone="accent">Not enrolled</Badge>}
+              </li>
+            ))}
+          </ul>
+          <div className="hidden overflow-x-auto sm:block">
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="border-b border-line text-xs uppercase tracking-wide text-muted">
@@ -68,6 +83,7 @@ export default async function PurchasesPage() {
               ))}
             </tbody>
           </table>
+          </div>
         </Card>
       )}
     </section>

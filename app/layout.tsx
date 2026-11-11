@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Fredoka, Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -21,6 +21,13 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Krumms",
   description: "One app, one AI agent, all your restaurant rewards.",
+};
+
+// viewportFit "cover" lets the phone tab bar sit under the iPhone home indicator (it pads itself with the safe area).
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({

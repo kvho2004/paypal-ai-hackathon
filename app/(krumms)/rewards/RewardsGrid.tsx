@@ -60,12 +60,11 @@ const DOTS = 10;
  * Progress toward a reward as a punch card: one dot per tenth of the point cost. A card is only full when the
  * reward is actually redeemable, so a nearly-there balance never shows ten dots.
  */
-function ProgressCell({ data }: ICellRendererParams<RewardRow>) {
-  if (!data) return null;
-  const ready = data.pointsNeeded === 0;
-  const filled = ready ? DOTS : Math.min(DOTS - 1, Math.floor(data.progress * DOTS));
+function PunchDots({ row }: { row: RewardRow }) {
+  const ready = row.pointsNeeded === 0;
+  const filled = ready ? DOTS : Math.min(DOTS - 1, Math.floor(row.progress * DOTS));
   return (
-    <div className="flex h-full items-center gap-2" title={`${data.balance} of ${data.pointCost} points`}>
+    <div className="flex items-center gap-2" title={`${row.balance} of ${row.pointCost} points`}>
       <span className="flex gap-1" aria-hidden>
         {Array.from({ length: DOTS }, (_, i) => (
           <span
@@ -77,9 +76,67 @@ function ProgressCell({ data }: ICellRendererParams<RewardRow>) {
         ))}
       </span>
       <span className={`text-xs ${ready ? "font-semibold text-success" : "text-muted"}`}>
-        {ready ? "Ready!" : `${data.pointsNeeded} to go`}
+        {ready ? "Ready!" : `${row.pointsNeeded} to go`}
       </span>
     </div>
+  );
+}
+
+function ProgressCell({ data }: ICellRendererParams<RewardRow>) {
+  if (!data) return null;
+  return (
+    <div className="flex h-full items-center">
+      <PunchDots row={data} />
+    </div>
+  );
+}
+
+/** Phone layout: one card per reward, because the grid's columns do not fit a narrow screen. */
+function RewardCard({ row }: { row: RewardRow }) {
+  const live = row.source === "live";
+  const flagText = row.valueFlag === "best" ? "Best value" : row.valueFlag === "poor" ? "Poor use of points" : null;
+  return (
+    <li className="rounded-2xl border border-line bg-surface p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="font-medium">{row.reward}</p>
+          <p className="text-xs text-muted">
+            {row.programName} · {row.pointCost} points
+          </p>
+        </div>
+        {row.centsPerPoint !== null && (
+          <div className="shrink-0 text-right">
+            <p
+              className={`font-display text-lg font-semibold ${
+                row.valueFlag === "best" ? "text-success" : row.valueFlag === "poor" ? "text-danger" : "text-brand-text"
+              }`}
+            >
+              {row.centsPerPoint.toFixed(2)}¢
+            </p>
+            <p className="text-[11px] text-muted">per point</p>
+          </div>
+        )}
+      </div>
+      <div className="mt-3">
+        <PunchDots row={row} />
+      </div>
+      <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted">
+        {flagText && (
+          <span
+            className={`rounded-full px-2 py-0.5 font-medium ${
+              row.valueFlag === "best" ? "bg-success/15 text-success" : "bg-danger/15 text-danger"
+            }`}
+          >
+            {flagText}
+          </span>
+        )}
+        <span className={`rounded-full px-2 py-0.5 font-medium ${live ? "bg-success/15 text-success" : "bg-accent text-[#4a3700]"}`}>
+          {row.source}
+        </span>
+        <span>{timeAgo(row.fetchedAt)}</span>
+        {row.expiresAt && <span>· expires {row.expiresAt}</span>}
+      </div>
+    </li>
   );
 }
 
@@ -168,6 +225,12 @@ export default function RewardsGrid({ rows }: { rows: RewardRow[] }) {
     [hasExpiry],
   );
 
+  // The grid filters itself (quickFilterText); the phone cards need the same filter applied by hand.
+  const needle = filter.trim().toLowerCase();
+  const visibleRows = needle
+    ? rows.filter((r) => `${r.programName} ${r.reward}`.toLowerCase().includes(needle))
+    : rows;
+
   return (
     <div>
       <input
@@ -178,7 +241,13 @@ export default function RewardsGrid({ rows }: { rows: RewardRow[] }) {
         aria-label="Filter rewards"
         className="mb-3 w-full max-w-xs rounded-full border border-line bg-k-bg px-4 py-1.5 text-sm outline-none focus:border-brand-text"
       />
-      <div>
+      <ul className="space-y-3 sm:hidden">
+        {visibleRows.map((r) => (
+          <RewardCard key={r.id} row={r} />
+        ))}
+        {visibleRows.length === 0 && <li className="py-6 text-center text-sm text-muted">No rewards match.</li>}
+      </ul>
+      <div className="hidden sm:block">
         <AgGridReact<RewardRow>
           theme={theme}
           rowData={rows}

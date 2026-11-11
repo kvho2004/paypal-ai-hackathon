@@ -35,9 +35,10 @@ export default async function RewardsPage() {
             <StatTile label="Ready to redeem" value={ready} hint="you have enough points" />
             {best && <StatTile label="Best value" value={`${best.centsPerPoint!.toFixed(2)}¢`} hint={best.reward} />}
           </div>
-          <Card className="p-3">
+          {/* On phones the rewards are cards on the page itself, so the grid's frame is only for wider screens. */}
+          <div className="sm:rounded-2xl sm:border sm:border-line sm:bg-surface sm:p-3 sm:shadow-sm">
             <RewardsGrid rows={rows} />
-          </Card>
+          </div>
         </>
       )}
     </section>
