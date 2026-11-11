@@ -1,6 +1,12 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Fredoka, Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+
+// Rounded display face for Krumms headings, close to the chunky hand-drawn feel of the logo.
+const fredoka = Fredoka({
+  variable: "--font-fredoka",
+  subsets: ["latin"],
+});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,6 +23,13 @@ export const metadata: Metadata = {
   description: "One app, one AI agent, all your restaurant rewards.",
 };
 
+// viewportFit "cover" lets the phone tab bar sit under the iPhone home indicator (it pads itself with the safe area).
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -25,7 +38,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${fredoka.variable} antialiased`}
       >
         {children}
       </body>

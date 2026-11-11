@@ -33,7 +33,7 @@ export default function LoginForm({ next }: { next: string }) {
   }
 
   const input =
-    "mt-1 w-full rounded border border-black/15 bg-transparent px-3 py-2 text-sm dark:border-white/20";
+    "mt-1 w-full rounded-xl border border-line bg-k-bg px-3 py-2 text-sm outline-none focus:border-brand-text";
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
@@ -46,14 +46,14 @@ export default function LoginForm({ next }: { next: string }) {
         <input name="password" type="password" required autoComplete="current-password" className={input} />
       </label>
       {error && (
-        <p role="alert" className="text-sm text-red-600 dark:text-red-400">
+        <p role="alert" className="text-sm text-danger">
           {error}
         </p>
       )}
       <button
         type="submit"
         disabled={busy}
-        className="w-full rounded bg-foreground px-3 py-2 text-sm font-medium text-background disabled:opacity-60"
+        className="w-full rounded-full bg-brand px-3 py-2.5 text-sm font-medium text-brand-contrast disabled:opacity-60"
       >
         {busy ? "Signing in..." : "Sign in"}
       </button>

@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import BrandMark from "../components/BrandMark";
 import { safeNext, sessionSecretConfigured } from "../../lib/auth/session";
 import { getCurrentUser } from "../../lib/auth/server";
 import LoginForm from "./LoginForm";
@@ -17,27 +18,37 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
       : null;
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center px-6">
-      <h1 className="text-2xl font-semibold tracking-tight">Sign in to Krumms</h1>
-      <p className="mt-1 mb-6 text-sm opacity-70">One app for all your restaurant rewards.</p>
-      {sessionSecretConfigured() ? (
-        <LoginForm next={next} />
-      ) : (
-        <p role="alert" className="text-sm text-red-600 dark:text-red-400">
-          Sign-in is not configured on this server (SESSION_SECRET is missing).
-        </p>
-      )}
-      {demo && (
-        <div className="mt-6 rounded border border-black/10 p-3 text-xs dark:border-white/15">
-          <p className="font-medium">Demo student account</p>
-          <p className="mt-1 opacity-80">
-            Email: <code>{demo.email}</code>
-          </p>
-          <p className="opacity-80">
-            Password: <code>{demo.password}</code>
-          </p>
+    <div className="krumms flex items-center justify-center px-6 py-10">
+      <main className="w-full max-w-sm">
+        <div className="mb-6 flex flex-col items-center text-center">
+          <BrandMark className="h-20 w-24" />
+          <h1 className="mt-2 font-display text-4xl font-semibold tracking-tight text-brand-text">Krumms</h1>
+          <p className="mt-1 text-sm text-muted">One app, one agent, all your restaurant rewards.</p>
         </div>
-      )}
-    </main>
+
+        <div className="rounded-2xl border border-line bg-surface p-6 shadow-sm">
+          <h2 className="mb-4 font-display text-xl font-semibold">Sign in</h2>
+          {sessionSecretConfigured() ? (
+            <LoginForm next={next} />
+          ) : (
+            <p role="alert" className="text-sm text-danger">
+              Sign-in is not configured on this server (SESSION_SECRET is missing).
+            </p>
+          )}
+        </div>
+
+        {demo && (
+          <div className="mt-4 rounded-2xl border border-dashed border-line bg-brand-soft p-4 text-xs">
+            <p className="font-medium text-brand-text">Demo student account</p>
+            <p className="mt-1 text-muted">
+              Email: <code className="text-k-fg">{demo.email}</code>
+            </p>
+            <p className="text-muted">
+              Password: <code className="text-k-fg">{demo.password}</code>
+            </p>
+          </div>
+        )}
+      </main>
+    </div>
   );
 }

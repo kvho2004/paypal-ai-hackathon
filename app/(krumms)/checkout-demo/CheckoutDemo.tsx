@@ -36,10 +36,13 @@ export default function CheckoutDemo({ clientId }: { clientId: string }) {
 
   if (paid) {
     return (
-      <div className="rounded-lg border border-green-600/30 bg-green-600/10 p-5">
-        <p className="font-medium">Paid {usd(paid.amountCents)} to Demo Diner</p>
-        <p className="mt-1 text-sm opacity-70">PayPal transaction {paid.paypalTxnId}. Purchase saved.</p>
-        <a href="/purchases" className="mt-3 inline-block text-sm underline underline-offset-4">
+      <div className="max-w-md rounded-2xl border border-success/40 bg-success/10 p-6">
+        <p className="font-display text-xl font-semibold text-success">Paid {usd(paid.amountCents)} to Demo Diner</p>
+        <p className="mt-1 text-sm text-muted">PayPal transaction {paid.paypalTxnId}. Purchase saved.</p>
+        <a
+          href="/purchases"
+          className="mt-4 inline-block rounded-full bg-brand px-4 py-2 text-sm font-medium text-brand-contrast"
+        >
           See it in your purchases
         </a>
       </div>
@@ -49,21 +52,30 @@ export default function CheckoutDemo({ clientId }: { clientId: string }) {
   return (
     <div className="max-w-md">
       <fieldset className="space-y-2">
-        <legend className="mb-2 text-sm font-medium">Choose a meal</legend>
-        {MEALS.map((m) => (
-          <label key={m.item} className="flex cursor-pointer items-center justify-between rounded border border-black/10 px-3 py-2 dark:border-white/15">
-            <span className="flex items-center gap-2">
-              <input
-                type="radio"
-                name="meal"
-                checked={meal.item === m.item}
-                onChange={() => setMeal(m)}
-              />
-              {m.item}
-            </span>
-            <span className="text-sm opacity-70">{usd(m.amountCents)}</span>
-          </label>
-        ))}
+        <legend className="mb-2 text-sm font-medium text-muted">Choose a meal</legend>
+        {MEALS.map((m) => {
+          const selected = meal.item === m.item;
+          return (
+            <label
+              key={m.item}
+              className={`flex cursor-pointer items-center justify-between rounded-2xl border px-4 py-3 transition-colors ${
+                selected ? "border-brand-text bg-brand-soft" : "border-line bg-surface hover:bg-brand-soft/50"
+              }`}
+            >
+              <span className="flex items-center gap-3 font-medium">
+                <input
+                  type="radio"
+                  name="meal"
+                  checked={selected}
+                  onChange={() => setMeal(m)}
+                  className="accent-[#2f398e]"
+                />
+                {m.item}
+              </span>
+              <span className="font-display text-lg text-brand-text">{usd(m.amountCents)}</span>
+            </label>
+          );
+        })}
       </fieldset>
 
       <div className="mt-5">
@@ -93,8 +105,8 @@ export default function CheckoutDemo({ clientId }: { clientId: string }) {
         </PayPalScriptProvider>
       </div>
 
-      {error && <p role="alert" className="mt-3 text-sm text-red-600 dark:text-red-400">{error}</p>}
-      <p className="mt-4 text-xs opacity-60">
+      {error && <p role="alert" className="mt-3 text-sm text-danger">{error}</p>}
+      <p className="mt-4 text-xs text-muted">
         Sandbox only: no real money moves. Log in as the student sandbox account to approve.
       </p>
     </div>
