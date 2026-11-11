@@ -12,6 +12,11 @@ export interface RawRewardsPage {
   screenshot?: Uint8Array; // PNG for the vision fallback
 }
 
+/** True if the URL is a sign-in or login page: as a RawRewardsPage.url, the site's session has expired. */
+export function isLoginPage(url: string): boolean {
+  return /sign-?in|log-?in/i.test(new URL(url).pathname);
+}
+
 export interface SignUpInfo {
   name: string;
   email: string;

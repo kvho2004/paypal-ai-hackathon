@@ -1,12 +1,15 @@
 import "dotenv/config";
-import { readFile } from "node:fs/promises";
+import { access, readFile } from "node:fs/promises";
+import { NEXT_TIER, OFFERS, REWARDS } from "../app/demo-diner/_lib/data";
 import { appearsInText, extractRewards } from "../lib/rewards/extract";
+import { FIXTURE_ACCOUNT, FIXTURE_PATH } from "./demo-diner-fixture";
 
 /**
  * Runs extract.ts on saved page text, without a browser.
  * Usage: npx tsx scripts/test-extract.ts [page.txt ...]
- *   With no files, reads .spike/chipotle/run-1.txt and .spike/panera/run-1.txt (gitignored, from the spike).
- * Also runs made-up pages that must be rejected, not guessed. Calls Claude, so it needs ANTHROPIC_API_KEY.
+ *   With no files, reads .spike/chipotle/run-1.txt and .spike/panera/run-1.txt if present (gitignored, from the spike).
+ * Always checks fixtures/demo-diner-rewards.txt against Demo Diner's own data, plus made-up pages: one with known
+ * values and some that must be rejected, not guessed. Calls Claude, so it needs ANTHROPIC_API_KEY.
  */
 
 const DEFAULT_FILES = [".spike/chipotle/run-1.txt", ".spike/panera/run-1.txt"];
@@ -24,7 +27,8 @@ const MUST_REJECT: Record<string, string> = {
   ].join("\n"),
 };
 
-// A made-up page whose result is known exactly, including comma-formatted numbers.
+// A made-up page whose result is known exactly, including comma-formatted numbers. Unlike the Demo Diner fixture
+// (620 points), its balance has a comma, and it needs no deploy to change.
 const KNOWN_PAGE = [
   "Hi, Sam",
   "1,330 points available",
@@ -43,6 +47,17 @@ const check = (ok: boolean, label: string) => {
   console.log(`  ${ok ? "PASS" : "FAIL"} ${label}`);
   if (!ok) failures++;
 };
+
+/** Checks two lists hold the same items in any order, and prints what's missing or extra if not. */
+const checkSameItems = (label: string, got: string[], want: string[]) => {
+  const missing = want.filter((w) => !got.includes(w));
+  const extra = got.filter((g) => !want.includes(g));
+  check(missing.length === 0 && extra.length === 0 && got.length === want.length, label);
+  for (const m of missing) console.log(`     missing  ${m}`);
+  for (const e of extra) console.log(`     extra    ${e}`);
+};
+
+const exists = (file: string) => access(file).then(() => true, () => false);
 
 // The "is this number on the page" guard, checked without calling Claude: [number, text, expected].
 const NUMBER_CASES: Array<[number, string, boolean]> = [
@@ -63,7 +78,13 @@ async function main() {
     check(appearsInText(n, text) === expected, `${n} ${expected ? "found" : "not found"} in "${text}"`);
   }
 
-  const files = process.argv.slice(2).length > 0 ? process.argv.slice(2) : DEFAULT_FILES;
+  const files = process.argv.slice(2);
+  if (files.length === 0) {
+    for (const file of DEFAULT_FILES) {
+      if (await exists(file)) files.push(file);
+      else console.log(`\n${file}\n  skipped: not found (spike output is gitignored; pass page files to check others)`);
+    }
+  }
 
   for (const file of files) {
     console.log(`\n${file}`);
@@ -77,6 +98,8 @@ async function main() {
     for (const r of rewards) console.log(`     reward  ${r.pointCost} pts  ${r.name}${r.expiresAt ? `  (until ${r.expiresAt})` : ""}`);
     for (const o of offers) console.log(`     offer   ${o.name}${o.expiresAt ? `  (until ${o.expiresAt})` : ""}`);
   }
+
+  await checkDemoDiner();
 
   console.log("\nknown made-up page");
   const known = await extractRewards(KNOWN_PAGE);
@@ -98,6 +121,37 @@ async function main() {
 
   console.log(failures === 0 ? "\nAll checks passed." : `\n${failures} check(s) failed.`);
   process.exit(failures === 0 ? 0 : 1);
+}
+
+/** The saved Demo Diner page, checked against the site's own data, so a data change without a new fixture fails. */
+async function checkDemoDiner() {
+  console.log(`\n${FIXTURE_PATH} (expected: Demo Diner's data for ${FIXTURE_ACCOUNT.email})`);
+  const result = await extractRewards(await readFile(FIXTURE_PATH, "utf8"));
+  check(result.ok, `extracted${result.ok ? "" : ` (${result.error})`}`);
+  if (!result.ok) return;
+
+  const { points, rewards, offers, tierProgress } = result.rewards;
+  check(points === FIXTURE_ACCOUNT.points, `points ${FIXTURE_ACCOUNT.points} (got ${points})`);
+
+  const show = (r: { name: string; pointCost: number; expiresAt: string | null }) => `${r.name} ${r.pointCost} ${r.expiresAt ?? "-"}`;
+  checkSameItems(
+    `all ${REWARDS.length} rewards with exact names, costs and dates, nothing else`,
+    rewards.map(show),
+    REWARDS.map((r) => show({ ...r, expiresAt: r.availableThrough ?? null })),
+  );
+  checkSameItems(
+    `all ${OFFERS.length} offers by name, nothing else`,
+    offers.map((o) => o.name),
+    OFFERS.map((o) => o.title),
+  );
+  // Hardcoded: the site's data has this date only inside the offer's details text.
+  check(offers.find((o) => /\$2 off/.test(o.name))?.expiresAt === "2026-11-20", "$2 off any bowl redeem-by 2026-11-20");
+  check(
+    tierProgress?.tierName === NEXT_TIER.name &&
+      tierProgress.current === FIXTURE_ACCOUNT.lifetimePoints &&
+      tierProgress.target === NEXT_TIER.lifetimeTarget,
+    `tier ${NEXT_TIER.name} ${FIXTURE_ACCOUNT.lifetimePoints} / ${NEXT_TIER.lifetimeTarget} (got ${JSON.stringify(tierProgress)})`,
+  );
 }
 
 main().catch((err) => {
