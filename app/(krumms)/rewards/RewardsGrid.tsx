@@ -10,7 +10,7 @@ import {
   type ColDef,
   type ICellRendererParams,
 } from "ag-grid-community";
-import type { RewardRow } from "../../lib/views/rewards";
+import type { RewardRow } from "../../../lib/views/rewards";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 

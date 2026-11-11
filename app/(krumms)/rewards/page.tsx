@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { DEMO_USER_ID } from "../../lib/purchases";
-import { getRewardRows } from "../../lib/views/rewards";
+import { DEMO_USER_ID } from "../../../lib/purchases";
+import { getRewardRows } from "../../../lib/views/rewards";
 import RewardsGrid from "./RewardsGrid";
 
 // Balances change, so read them at request time.
