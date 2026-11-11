@@ -74,13 +74,12 @@ export type ApprovalResult =
   - `earnRate` comes from the `Program` row that `seed-catalog` upserts.
 
 **Catalog (Dev 2) → `seed-catalog.ts` (Dev 1):**
-- `data/catalog/demo-diner.json` is loaded and zod-checked by `loadCatalog` in `lib/scoring/catalog.ts`. Import it; don't parse the JSON yourself.
-- **Shape:** `{ programId, name, earnRate, source, asOf, items: [{ name, menuPriceCents, pointCost | null, copayCents?, tags }] }`.
+- `lib/scoring/catalog.ts` loads and zod-checks `data/catalog/*.json`. Use `listCatalogs()` (all programs) or `loadCatalog(programId)`; don't parse the JSON yourself.
+- **Shape:** `{ programId, name, earnRate, items: [{ name, menuPriceCents, pointCost | null, tags }] }`. `pointCost: null` marks a menu-only item.
 - **Mapping:**
-  - The file → one `Program` row (`id`, `name`, `earnRate`).
+  - Each catalog → one `Program` row (`id`, `name`, `earnRate`). The catalog has no `domain`: take it from the adapter (`demoDiner.domain` in `lib/rewards/adapters/demo-diner.ts`).
   - Each item → one `CatalogItem` row (`rewardName` = `name`, plus `menuPriceCents` and `pointCost`).
-  - `tags`, `source`, `asOf` and `copayCents` stay in the JSON; `suggestMeals` reads them from the loader.
-- **No seeded balance.** The Producer's catalog note suggests seeding 90 points in `reset-demo`. Don't: the balance comes from the live connect (Alex, 620). See dev2-tuesday.md §6, D3.
+  - `tags` stay in the JSON; `suggestMeals` reads them from the loader.
 
 **`/connect` routes (Dev 2) → `ConnectFlow.tsx` (Dev 1):**
 - `POST /api/connect/[program]` → `{ connectionId, hostedUrl }`
