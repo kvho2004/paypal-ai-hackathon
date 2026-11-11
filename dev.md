@@ -121,7 +121,7 @@ interface RewardsAdapter {
 ### Flow
 1. **Connect:** `kernel.auth.connections.create({ domain, profile_name: "<userId>-<programId>" })`, then `connections.login(id)` returns a `hosted_url`. User logs in themselves (Krumms never sees the password). Poll or stream status until `SUCCESS`.
 2. **Read:** launch a Kernel browser with that profile, navigate to `balanceUrl`, grab visible text (and a screenshot as fallback).
-3. **Extract:** send page text to Claude with a strict zod schema: `{ points, rewards: [{ name, pointCost, expiresAt? }], tierProgress? }`. Validate; reject if fields are missing rather than guessing.
+3. **Extract:** send page text to Claude with a strict zod schema (`lib/rewards/types.ts`): `{ points, rewards: [{ name, pointCost, expiresAt }], offers: [{ name, details, expiresAt }], tierProgress }`. `rewards` are redeemed with points; `offers` are deals that don't cost points (discounts, coupons, bonus-point promos). Every field is required: anything the page doesn't show is `null` (or an empty list), never guessed. Validate; reject if fields are missing.
 4. **Store:** write to `balances` with `fetchedAt` and `source: "live"`. UI shows freshness ("updated 2 min ago").
 5. **Fail gracefully:** if login or extraction fails, mark `status: NEEDS_AUTH` or `EXTRACT_FAILED` and offer the manual fallback (enter balance or upload a screenshot, parsed by Claude vision).
 
@@ -152,6 +152,7 @@ cents_per_point = (menu_price_cents - copay_cents) / point_cost
 - **Rank** redemptions by `cents_per_point`; flag "poor use" when below the program's median by 30%+.
 - **Close to earning:** `points_needed = point_cost - balance`; surface rewards where `points_needed <= typical_points_per_visit * 2`. `typical_points_per_visit` comes from PayPal purchase averages times the program's earn rate.
 - **Recommendation score** for chat suggestions combines: price within budget, preference match (diet, blocklist), redemption value, and offers. Keep weights in one config file.
+- **Offers** are stored as text (name, details, expiry), not parsed into dollar or point values. The agent mentions a live offer when it fits ("$2 off any bowl until Nov 20"); in the score an unexpired matching offer is at most a tie-breaker, so scoring stays deterministic.
 
 ---
 
@@ -255,6 +256,8 @@ model Purchase    { id String @id; userId String; paypalTxnId String @unique; me
 model CatalogItem { id String @id; programId String; rewardName String; menuPriceCents Int; pointCost Int? }
 model Action      { id String @id; userId String; type String; payload Json; status String; createdAt DateTime }
 ```
+
+`Balance.rewards` holds the rest of the extraction result as JSON: `{ rewards, offers, tierProgress }` (shapes in `lib/rewards/types.ts`).
 
 ---
 
