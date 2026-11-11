@@ -21,7 +21,6 @@ async function main() {
       name: "Demo Student",
       email,
       passwordHash,
-      paypalSandboxEmail: process.env.SEED_RECIPIENT_EMAIL ?? null,
       prefs: {},
     },
     update: { email, passwordHash },
