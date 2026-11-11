@@ -51,7 +51,7 @@ export default function Nav({ userName }: { userName?: string }) {
 
   return (
     <>
-      <header className="sticky top-0 z-10 border-b border-line bg-surface/90 backdrop-blur">
+      <header className="sticky top-0 z-40 border-b border-line bg-surface/90 backdrop-blur">
         <div className="mx-auto flex max-w-5xl items-center gap-6 px-4 py-2.5 sm:px-6 sm:py-3">
           <Link href="/" className="flex items-center gap-2">
             <BrandMark className="h-7 w-9 sm:h-8 sm:w-10" />
@@ -97,7 +97,7 @@ export default function Nav({ userName }: { userName?: string }) {
 
       <nav
         aria-label="Primary"
-        className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-surface/95 backdrop-blur sm:hidden"
+        className="fixed inset-x-0 bottom-0 z-50 border-t border-line bg-surface/95 backdrop-blur sm:hidden"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
         <ul className="mx-auto grid max-w-md grid-cols-4">

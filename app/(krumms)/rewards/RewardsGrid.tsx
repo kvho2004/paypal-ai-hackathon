@@ -15,7 +15,7 @@ import type { RewardRow } from "../../../lib/views/rewards";
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 // AG Grid's theme API takes colors, not CSS classes, so the brand blue (#2f398e) is repeated here for each mode.
-const theme = themeQuartz
+export const theme = themeQuartz
   .withPart(colorSchemeVariable)
   .withParams(
     {
@@ -60,7 +60,7 @@ const DOTS = 10;
  * Progress toward a reward as a punch card: one dot per tenth of the point cost. A card is only full when the
  * reward is actually redeemable, so a nearly-there balance never shows ten dots.
  */
-function PunchDots({ row }: { row: RewardRow }) {
+export function PunchDots({ row }: { row: RewardRow }) {
   const ready = row.pointsNeeded === 0;
   const filled = ready ? DOTS : Math.min(DOTS - 1, Math.floor(row.progress * DOTS));
   return (
@@ -86,7 +86,7 @@ function PunchDots({ row }: { row: RewardRow }) {
         {ready ? "Ready!" : `${row.pointsNeeded} to go`}
       </span>
       {row.pendingPoints > 0 && (
-        <span className="whitespace-nowrap rounded-full bg-accent/60 px-1.5 py-0.5 text-[10px] font-medium text-[#4a3700]">
+        <span className="whitespace-nowrap rounded-full bg-accent/60 px-1.5 py-0.5 text-[10px] font-medium leading-4 text-[#4a3700]">
           +{row.pendingPoints} pending
         </span>
       )}
@@ -170,10 +170,8 @@ function FreshnessCell({ data }: ICellRendererParams<RewardRow>) {
   );
 }
 
-export default function RewardsGrid({ rows }: { rows: RewardRow[] }) {
-  const [filter, setFilter] = useState("");
-
-  // The theme follows the OS light/dark setting.
+/** Makes any AG Grid on the page follow the OS light/dark setting. Shared by every grid in the app. */
+export function useAgThemeMode() {
   useEffect(() => {
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
     const apply = () => document.body.setAttribute("data-ag-theme-mode", mq.matches ? "dark" : "light");
@@ -181,6 +179,11 @@ export default function RewardsGrid({ rows }: { rows: RewardRow[] }) {
     mq.addEventListener("change", apply);
     return () => mq.removeEventListener("change", apply);
   }, []);
+}
+
+export default function RewardsGrid({ rows }: { rows: RewardRow[] }) {
+  const [filter, setFilter] = useState("");
+  useAgThemeMode();
 
   const hasExpiry = rows.some((r) => r.expiresAt);
 
@@ -217,7 +220,7 @@ export default function RewardsGrid({ rows }: { rows: RewardRow[] }) {
       {
         field: "progress",
         headerName: "Close to earning",
-        width: 250,
+        width: 310,
         cellRenderer: ProgressCell,
         comparator: (a: number, b: number) => a - b,
       },
@@ -270,14 +273,15 @@ export default function RewardsGrid({ rows }: { rows: RewardRow[] }) {
           autoSizeStrategy={{
             type: "fitGridWidth",
             columnLimits: [
-              { colId: "programName", minWidth: 120 },
-              { colId: "expiresAt", minWidth: 100 },
-              { colId: "pointCost", minWidth: 80 },
-              { colId: "menuValueCents", minWidth: 105 },
+              { colId: "programName", minWidth: 110 },
+              { colId: "expiresAt", minWidth: 90 },
+              { colId: "pointCost", minWidth: 82 },
+              { colId: "menuValueCents", minWidth: 85 },
               { colId: "centsPerPoint", minWidth: 95 },
-              { colId: "progress", minWidth: 215 },
-              { colId: "fetchedAt", minWidth: 150 },
-              { colId: "reward", minWidth: 130 },
+              // dots + "Ready!" or "N to go" + the "+N pending" chip
+              { colId: "progress", minWidth: 295 },
+              { colId: "fetchedAt", minWidth: 168 },
+              { colId: "reward", minWidth: 105 },
             ],
           }}
           quickFilterText={filter}
