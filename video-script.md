@@ -1,69 +1,97 @@
 # Krumms Demo Video Script
 
-Nov 9, 2026
+Nov 10, 2026
 
 ## Overview
 
-The script runs about 2:55 with roughly 390 spoken words, which leaves a few seconds of buffer under the 3:00 limit.
+The script runs about 2:50 with roughly 390 spoken words, which leaves a few seconds of buffer under the 3:00 limit. It opens with a real student problem, backs it with numbers, then shows Krumms solving it end to end.
 
-- **Pace:** about 150 words per minute, relaxed and conversational, like explaining the app to a friend.
-- **Cast:** one narrator (the Producer or whoever sounds most natural). The agent's replies appear as on-screen text, not voiceover.
-- **Story:** a student with too many food apps finds the best deal, pays with PayPal, and watches rewards update. It follows the demo story in the development plan.
-- **Restaurants on screen:** Demo Diner (the working rewards flow and PayPal merchant) and Basil Bowl (a second fictional program the student hasn't joined yet). No real brands appear.
+- **Pace:** about 140 words per minute. Relaxed and natural, like talking to a classmate. No performing.
+- **Cast:** one narrator, on camera for the opening and the ending, voiceover for the demo. The agent's replies appear as on-screen text.
+- **Recurring thread:** "my favorite burrito place." It opens the video, comes back in the demo, and pays off with a free entrée.
+- **Places on screen:** two clearly fictional restaurants, a burrito spot and a café. No real brand names or logos appear anywhere, in the narration or on screen (Official Rules, section 4).
+
+**Loop tracker**
+
+| Loop | Opened | Closed |
+| --- | --- | --- |
+| Never redeemed a reward at my favorite burrito place | 0:00 | 1:55, the order gets me to a free entrée |
+| Can an AI agent close the gap between food insecurity and unused rewards? | 0:28 | The whole demo, wrapped up at 2:40 |
+| A café I visit weekly where I earn nothing | 0:38 | 2:17, the agent signs me up |
+| Can I trust an AI with my money? | 1:55 | 2:05, nothing happens until I approve it |
 
 ## Script
 
-Each row is one shot. Read the voiceover column aloud; the on-screen column tells the editor and devs what must be visible.
+Each row is one shot. Personal details in the opening (how often, how long) should be changed to match whoever narrates, so they're true.
 
 | Time | On screen | Voiceover |
 | --- | --- | --- |
-| 0:00–0:08 | Phone home screen. A folder of five fictional food apps, each with a points badge. | "Okay, real question. How many food apps are on your phone right now? Because I had five." |
-| 0:08–0:20 | Stat overlay: "26% of loyalty points go unspent. About $10B in missed savings every year." Small source line underneath. | "Five apps, five point balances, and I was still eating ramen on a Tuesday because I never knew which reward was actually worth using. And that's super common. Billions in rewards just sit there or expire." |
-| 0:20–0:24 | Title card: **Krumms**. "Stop leaving crumbs on the table." | "So we built Krumms." |
-| 0:24–0:48 | Krumms home. Link PayPal, with the sandbox label visible. Agent message types out: "You've spent $86 on food this month, mostly at Demo Diner and Basil Bowl. You're in Demo Diner Rewards, but not Basil Bowl's." | "Krumms is one AI agent for all your food rewards. It starts with your PayPal activity to see where you actually eat. And it already caught something I missed: I go to Basil Bowl every week, and I've earned zero points there." |
-| 0:48–1:08 | Connect accounts, then Demo Diner, then the hosted login page. Cut to the cloud browser live view navigating to the points page. | "Next, I connect my rewards account. I log in on a secure hosted page, so Krumms never sees my password. Then the agent opens its own browser and reads my points for me." |
-| 1:08–1:28 | Rewards view (AG Grid) fills in. Sort by cents per point. Highlight a green "best value" row, then a red "poor use" row. | "Everything lands in one view, ranked by what each point is actually worth. Green is a great deal. Red is you wasting points. Like, this free cookie for 200 points? Please don't." |
-| 1:28–1:38 | Chat. User types: "lunch under $8, nothing fried, and stop suggesting burgers" | "Now I can just talk to it, like a friend who's weirdly good with money." |
-| 1:38–2:06 | Agent reply with an in-chat grid of three ranked picks. Top pick: "Grain bowl at Demo Diner, $7.25. Puts you 1 visit from a free drink." A "No burgers" preference chip appears. | "It checks my balances, my budget, and what I don't want, and it remembers that. No burgers until I say so. Top pick is a seven-dollar grain bowl at Demo Diner, and it gets me one visit away from a free drink." |
-| 2:06–2:26 | Approval card (item, price, reward impact), then Approve, then PayPal sandbox checkout, then success. Progress bar jumps. A text arrives on a phone: "1 visit from a free drink at Demo Diner." | "The agent sets up the order, but nothing gets paid until I approve it. One tap, pay with PayPal, done. My progress updates right away, and I get a text: one more visit to a free drink." |
-| 2:26–2:38 | Agent card: "Want to join Basil Bowl Rewards?" Approve. "You're in." | "And remember Basil Bowl? Krumms asks if I want to join their rewards. I say yes, and it handles the sign-up." |
-| 2:38–2:50 | Architecture slide with tool names as text. | "Under the hood: PayPal for purchase history and agentic checkout, Claude as the agent, Kernel for the browser, plus AG Grid, Render, APIMatic, Zapier, and Postman." |
-| 2:50–2:55 | End card: Krumms, hosted demo URL, GitHub repo. | "Krumms. Eat well, spend less, and stop leaving crumbs on the table." |
+| 0:00–0:08 | Narrator on camera, phone in hand. | "There's a burrito place near campus I go to probably twice a week. I've been in their rewards program for over a year, and I've never actually redeemed anything." |
+| 0:08–0:28 | Narrator on camera. Simple text overlays for each stat, with the source in small text. | "That sounds like a small thing, but for a lot of students it isn't. Depending on the study, somewhere between one in five and one in three college students deal with food insecurity. For students on Pell Grants, it's close to thirty percent. And about a quarter of loyalty points never get used. That's food people already paid for." |
+| 0:28–0:38 | Narrator on camera. | "So we wanted to see if an AI agent could close that gap. Find the food money that's already sitting in your rewards apps and actually get it to you." |
+| 0:38–1:00 | Krumms home screen, link PayPal (sandbox label visible), then Krumm's summary of where you've been spending, with one place flagged "Not in rewards." | "This is Krumms. I linked my PayPal, and it looked at where my food money actually goes. Most of it's my favorite burrito place, which wasn't a surprise. But it also noticed a café I go to almost every week, and I'm not in their rewards program at all. That's a lot of visits that earned me nothing." |
+| 1:00–1:28 | Hosted login, then the cloud browser reading the rewards page, then the rewards grid (AG Grid) filling in and sorting by value. | "To see my points, I log in on a secure page, so Krumms never gets my password. Then the agent opens its own browser and reads my rewards for me. Everything shows up in one place, ranked by what each reward is really worth, so I'm not spending points on something small when they could cover a whole meal." |
+| 1:28–1:55 | Chat. User types "lunch under $10, something filling, no burgers." Krumm replies with three ranked picks in a grid and a "No burgers" chip. | "Then I just ask for what I need. Lunch under ten dollars, something filling, and no burgers. It checks my points and my budget, remembers what I said, and the top pick is a bowl from my favorite burrito place, because it gets me to a free entrée." |
+| 1:55–2:17 | Approval card (item, price, reward impact). Hold one second. Then PayPal sandbox checkout, then the paw stamps filling up. | "That's the part I like most. It does the work. It finds the reward, sets up the order, and pays with PayPal, but it can't spend anything on its own. I see the price and what it does for my rewards, and nothing happens until I approve it. This is PayPal's sandbox, so no actual burrito today, but the flow is the same." |
+| 2:17–2:27 | Krumm's card "Want to join this café's rewards?", then approve. | "It also offered to sign me up for that café's rewards, so those weekly visits finally count for something." |
+| 2:27–2:40 | Architecture slide, tool names as plain text, no logos. | "Krumms is built on PayPal's Agent Toolkit for checkout and PayPal transaction data for purchase history, with Claude as the agent, Kernel for the browser, AG Grid, Render, and APIMatic." |
+| 2:40–2:50 | Narrator on camera, then the end card with the Krumms logo, hosted demo URL, and GitHub repo. | "A free entrée isn't going to fix food insecurity. But when you're stretching every dollar, it matters. That's why we built Krumms." |
 
-## Production notes and rules checklist
+## Writing rules for this script
 
-Record the voiceover separately from the screen takes, then cut the screen to fit the voice. That keeps the timing tight and lets you redo a line without re-recording the demo.
+- No colon setups like "Here's the worst part:" or "The real test:". They sound AI-written.
+- No "It wasn't X, it was Y" contrasts, no "Let's find out," no trailer-voice lines.
+- Sound like a college student talking normally, but keep it professional. Minimal acting.
+- Every number is exact and sourced.
 
-**Recording tips**
+## Rules check (from `docs/official-rules.txt`)
 
-- Read the full script aloud with a timer before recording. If it runs over 2:50, use the trim plan below.
-- Reset with the `DEMO_MODE` script before every take so balances and the $86 figure match the voiceover.
-- Speed-ramp the slow parts (cloud browser loading, PayPal approval) and add a small "2x" tag so judges know it's the real flow.
-- Hold for about one second on the approval card. "Nothing gets paid until I approve it" is the trust moment PayPal cares about most.
-- Add captions. Many judges watch without sound.
-- Keep music royalty-free and low under the voice.
+- [ ] Final cut under 3:00 (target 2:50). Judges aren't required to watch past 3:00.
+- [ ] No third-party trademarks in narration or on screen. No real restaurant names, logos, or app screens.
+- [ ] No copyrighted music. Royalty-free only.
+- [ ] Every screen shown actually works in the build ("must function as depicted in the video").
+- [ ] Footage shows the real app running in a browser, not Figma or mockups.
+- [ ] Tool names on the architecture slide as plain text, no logos.
+- [ ] Sandbox label visible during PayPal steps, and the narration says it's the sandbox.
+- [ ] Uploaded to YouTube as public, link on the Devpost submission form.
+- [ ] Submit by Thu Nov 12, 12:00 PM Pacific (3:00 PM Eastern).
+- [ ] Hosted demo, sandbox credentials, and API keys keep working through the end of judging (Dec 15).
 
-**Hackathon rules**
+## What each scene scores
 
-- [ ] Final cut under 3:00 (target 2:55)
-- [ ] Shows the real app running in a browser, not Figma screens
-- [ ] No third-party trademarks or logos: fictional restaurant names only. If the real-program spike works, call it "a real coffee chain's rewards account" and blur its branding
-- [ ] Tool names on the architecture slide as text, unless you've confirmed logo use is allowed
-- [ ] Sandbox label visible during PayPal steps
-- [ ] Uploaded to YouTube as public, link added to the submission form
-- [ ] Source for the stat overlay shown on screen and listed in the README
+| Judging criterion | Where the script covers it |
+| --- | --- |
+| Technological Implementation (first tiebreaker) | 0:38 PayPal purchase history, 1:00 agent browser + extraction, 1:28 agent reasoning, 1:55 PayPal checkout, 2:27 Agent Toolkit named |
+| Design | The Krumms UI throughout, especially the rewards grid and chat |
+| Potential Impact | 0:08 food insecurity and unused points stats, 2:40 closing |
+| Innovation | 1:55 "It does the work," an agent that acts on your rewards with your approval |
+| Presentation | Problem, audience, and why it matters in the first 38 seconds, then one end-to-end flow |
+
+## Production notes for the team
+
+- Rename the fictional demo restaurants so they look like a burrito spot and a café (for example "Casa Bowl" and "Corner Café"). Keep them clearly fictional and not resembling any real brand.
+- Seed the demo data so the bowl order reaches a free entrée at the burrito place.
+- The café join step (2:17) must actually work. If `joinProgram` can't support it by filming, cut that row and drop the café mention at 0:38 too, so no loop is left open.
+- Record the voiceover separately, then cut screen footage to fit it.
+- Reset with the demo reset script before every take so numbers match the voiceover.
+- Speed-ramp slow parts (cloud browser loading, PayPal approval) with a small "2x" tag.
+- Hold one second on the approval card. It's the trust moment PayPal cares about most.
+- Add captions.
 
 ## Trim plan
 
-If the read runs long, cut in this order. Each cut saves about 4 to 8 seconds, and none of them removes the PayPal or AI story.
+If the read runs long, cut in this order. None of these removes the PayPal or AI story.
 
-1. Drop "And that's super common." from the opening.
-2. Drop the cookie joke at 1:08 ("Like, this free cookie for 200 points? Please don't.").
-3. Shorten the architecture line to: "Built on PayPal, Claude, and Kernel, with AG Grid, Render, APIMatic, Zapier, and Postman."
-4. Make the Basil Bowl sign-up a silent 3-second shot with the text "Joined Basil Bowl Rewards" on screen.
+1. Drop "For students on Pell Grants, it's close to thirty percent."
+2. Shorten 1:00 to: "I log in on a secure page, and the agent reads my rewards in its own browser. Everything shows up in one place, ranked by what each reward is really worth."
+3. Drop "That's the part I like most." at 1:55.
+4. Cut the café join scene (2:17 to 2:27).
 
-Never cut the approval and PayPal checkout shot or the ranked chat reply. Those carry the agentic commerce story.
+Never cut the opening, the stats, the chat pick, or the approval and PayPal checkout.
 
 ## Sources
 
-- Stat overlay (26.2% of loyalty points unspent, about $10B in missed savings): [Antavo Global Customer Loyalty Report 2026, via GCN](https://gcn.com/?p=21979)
+- Pell Grant recipients 28.4% vs. 16.3% food insecurity: [Temple University Hope Center, federal BPS data](https://hope.temple.edu/newsroom/hope-blog/new-longitudinal-federal-data-reveal-troubling-reality-students-basic-needs-insecurity-persists)
+- 19% lower-bound estimate of student food insecurity: [University of Illinois](https://news.illinois.edu/scholars-estimates-of-food-insecurity-among-college-students-problematic/)
+- 36% of university students food insecure: [NPR Illinois, Wisconsin HOPE Lab](https://www.nprillinois.org/post/food-housing-insecurity-may-be-keeping-college-students-graduating)
+- 26.2% of loyalty points unspent: [Antavo Global Customer Loyalty Report 2026, via GCN](https://gcn.com/?p=21979)
