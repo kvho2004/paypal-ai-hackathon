@@ -13,6 +13,7 @@
     "@ai-sdk/anthropic": "^4.0.99",
     "@onkernel/sdk": "^0.144.0",
     "@paypal/paypal-server-sdk": "^2.5.0",
+    "@paypal/react-paypal-js": "10.6.1",
     "@prisma/adapter-pg": "7.10.1",
     "@prisma/client": "7.10.1",
     "ag-grid-community": "36.3.0",
