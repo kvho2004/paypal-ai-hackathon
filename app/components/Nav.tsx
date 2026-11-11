@@ -79,12 +79,14 @@ export default function Nav({ userName }: { userName?: string }) {
           </nav>
 
           {userName && (
-            <div className="ml-auto flex items-center gap-3 text-sm">
-              <span className="hidden rounded-full bg-brand-soft px-3 py-1 text-brand-text sm:inline">{userName}</span>
+            <div className="ml-auto flex shrink-0 items-center gap-3 text-sm">
+              <span className="hidden whitespace-nowrap rounded-full bg-brand-soft px-3 py-1 text-brand-text lg:inline">
+                {userName}
+              </span>
               <button
                 type="button"
                 onClick={signOut}
-                className="rounded-full border border-line px-3 py-1 text-muted hover:bg-brand-soft hover:text-brand-text"
+                className="whitespace-nowrap rounded-full border border-line px-3 py-1 text-muted hover:bg-brand-soft hover:text-brand-text"
               >
                 Sign out
               </button>

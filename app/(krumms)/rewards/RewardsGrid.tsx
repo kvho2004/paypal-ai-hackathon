@@ -241,13 +241,14 @@ export default function RewardsGrid({ rows }: { rows: RewardRow[] }) {
         aria-label="Filter rewards"
         className="mb-3 w-full max-w-xs rounded-full border border-line bg-k-bg px-4 py-1.5 text-sm outline-none focus:border-brand-text"
       />
-      <ul className="space-y-3 sm:hidden">
+      <ul className="space-y-3 lg:hidden">
         {visibleRows.map((r) => (
           <RewardCard key={r.id} row={r} />
         ))}
         {visibleRows.length === 0 && <li className="py-6 text-center text-sm text-muted">No rewards match.</li>}
       </ul>
-      <div className="hidden sm:block">
+      {/* The grid's columns need about 900px, so cards cover phones and tablets and the grid starts at desktop width. */}
+      <div className="hidden lg:block">
         <AgGridReact<RewardRow>
           theme={theme}
           rowData={rows}

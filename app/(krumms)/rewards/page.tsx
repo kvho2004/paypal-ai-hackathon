@@ -35,8 +35,8 @@ export default async function RewardsPage() {
             <StatTile label="Ready to redeem" value={ready} hint="you have enough points" />
             {best && <StatTile label="Best value" value={`${best.centsPerPoint!.toFixed(2)}¢`} hint={best.reward} />}
           </div>
-          {/* On phones the rewards are cards on the page itself, so the grid's frame is only for wider screens. */}
-          <div className="sm:rounded-2xl sm:border sm:border-line sm:bg-surface sm:p-3 sm:shadow-sm">
+          {/* Below desktop width the rewards are cards on the page itself, so the grid's frame is only for wide screens. */}
+          <div className="lg:rounded-2xl lg:border lg:border-line lg:bg-surface lg:p-3 lg:shadow-sm">
             <RewardsGrid rows={rows} />
           </div>
         </>
