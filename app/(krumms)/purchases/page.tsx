@@ -1,4 +1,4 @@
-import { DEMO_USER_ID, getPurchaseSummary } from "../../lib/purchases";
+import { DEMO_USER_ID, getPurchaseSummary } from "../../../lib/purchases";
 
 // Query at request time, never at build time (the database is not reachable for static prerendering).
 export const dynamic = "force-dynamic";
