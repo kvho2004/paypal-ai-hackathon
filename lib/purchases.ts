@@ -3,6 +3,7 @@ import { db } from "./db";
 import {
   fetchRecentTransactions,
   summarize,
+  type FetchOptions,
   type NormalizedPurchase,
   type PurchaseSummaryRow,
 } from "./paypal/transactions";
@@ -46,10 +47,37 @@ export async function savePurchases(
   };
 }
 
-/** Pull the last `days` of PayPal transactions and store them for `userId`. */
-export async function ingestFromPayPal(userId: string, days: number) {
-  const purchases = await fetchRecentTransactions(days);
-  return { fetched: purchases.length, ...(await savePurchases(userId, purchases)) };
+/**
+ * A checkout payment shows up twice: once when we capture it (saved under the capture id) and again in
+ * the student's Transaction Search under a different transaction id whose `referenceId` is that capture id.
+ * Drop the second sighting so it is not double counted.
+ */
+export function withoutKnownCaptures(
+  purchases: NormalizedPurchase[],
+  knownTxnIds: ReadonlySet<string>,
+): NormalizedPurchase[] {
+  return purchases.filter((p) => !(p.referenceId && knownTxnIds.has(p.referenceId)));
+}
+
+/**
+ * Pull the last `days` of PayPal transactions and store them for `userId`.
+ * `options.eventCodes` limits which kinds of transaction count (the demo reset uses only the seed payouts).
+ */
+export async function ingestFromPayPal(userId: string, days: number, options: FetchOptions = {}) {
+  const fetched = await fetchRecentTransactions(days, options);
+
+  const refs = fetched.map((p) => p.referenceId).filter((r): r is string => !!r);
+  const known = await db.purchase.findMany({
+    where: { paypalTxnId: { in: refs } },
+    select: { paypalTxnId: true },
+  });
+  const purchases = withoutKnownCaptures(fetched, new Set(known.map((k) => k.paypalTxnId)));
+
+  return {
+    fetched: fetched.length,
+    skippedAsKnownCaptures: fetched.length - purchases.length,
+    ...(await savePurchases(userId, purchases)),
+  };
 }
 
 /**
