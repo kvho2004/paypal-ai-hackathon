@@ -6,13 +6,10 @@ import { db } from "../db";
 import { getAdapter } from "./adapters";
 import { extractRewards } from "./extract";
 import { getAuthState, profileName, withBrowser } from "./kernel";
-import { PageNotReadyError, type RawRewardsPage, type RefreshResult, type RewardsAdapter } from "./types";
+import { PageNotReadyError, isLoginPage, type RawRewardsPage, type RefreshResult, type RewardsAdapter } from "./types";
 
 type Failure = Extract<RefreshResult, { ok: false }>;
 const fail = (status: Failure["status"], error: string): Failure => ({ ok: false, status, error });
-
-// A sign-in or login page as the final URL means the site's session has expired.
-const LOGIN_PATH = /sign-?in|log-?in/i;
 
 /**
  * Reads a connection's rewards page, saves a Balance row, and records the outcome on Connection.status.
@@ -55,7 +52,7 @@ async function readRewards(conn: Connection, adapter: RewardsAdapter): Promise<R
     if (err instanceof PageNotReadyError) return fail("EXTRACT_FAILED", err.message);
     throw err;
   }
-  if (LOGIN_PATH.test(new URL(page.url).pathname)) return fail("NEEDS_AUTH", "The site redirected to its login page");
+  if (isLoginPage(page.url)) return fail("NEEDS_AUTH", "The site redirected to its login page");
 
   const extracted = await extractRewards(page.text);
   if (!extracted.ok) return fail("EXTRACT_FAILED", extracted.error);
