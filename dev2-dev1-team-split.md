@@ -13,7 +13,7 @@ Rule of thumb, as in `team-plan.md`:
 | Task (dev2-tuesday.md) | Owner | Notes |
 |---|---|---|
 | T0 Leftovers | Dev 2 | Dev 1 reviews + merges PR #16 |
-| T1 Catalog JSON + `lib/scoring/catalog.ts` | Dev 2 | With the Producer's numbers if they've landed |
+| T1 Catalog JSON + `lib/scoring/catalog.ts` | Dev 2 | Uses the live reward names; the Producer reviews the prices (D3) |
 | T1 `scripts/seed-catalog.ts` + add it to the demo reset routine | **Dev 1** | Demo state is Dev 1's |
 | T2 Scoring (`suggestMeals`, `rankRedemptions`, `closeToEarning`) | Dev 2 | |
 | T2 `pendingPoints` | **Dev 1** | Lives in `lib/views/rewards.ts` (see Contracts) |
@@ -72,6 +72,15 @@ export type ApprovalResult =
   - It's what makes the progress bar move after a payment.
   - Dev 2's `getRewards` / `rankRedemptions` / `suggestMeals` read it through `getRewardRows`, so there's one source of truth.
   - `earnRate` comes from the `Program` row that `seed-catalog` upserts.
+
+**Catalog (Dev 2) → `seed-catalog.ts` (Dev 1):**
+- `data/catalog/demo-diner.json` is loaded and zod-checked by `loadCatalog` in `lib/scoring/catalog.ts`. Import it; don't parse the JSON yourself.
+- **Shape:** `{ programId, name, earnRate, source, asOf, items: [{ name, menuPriceCents, pointCost | null, copayCents?, tags }] }`.
+- **Mapping:**
+  - The file → one `Program` row (`id`, `name`, `earnRate`).
+  - Each item → one `CatalogItem` row (`rewardName` = `name`, plus `menuPriceCents` and `pointCost`).
+  - `tags`, `source`, `asOf` and `copayCents` stay in the JSON; `suggestMeals` reads them from the loader.
+- **No seeded balance.** The Producer's catalog note suggests seeding 90 points in `reset-demo`. Don't: the balance comes from the live connect (Alex, 620). See dev2-tuesday.md §6, D3.
 
 **`/connect` routes (Dev 2) → `ConnectFlow.tsx` (Dev 1):**
 - `POST /api/connect/[program]` → `{ connectionId, hostedUrl }`
@@ -153,5 +162,5 @@ Drop in this order:
 - **Integration seam:** Dev 1's components and Dev 2's chat meet at `lib/agent/types.ts`. Freeze it once pushed; any change goes in a PR that names the other dev.
 - **Merges during filming:** every merge to `main` redeploys Render. Nothing merges between 3 and 6 PM except blocker fixes agreed by both.
 - **Shared DB during development:** `scripts/test-refresh.ts` creates and deletes its own rows. Don't run `reset-demo` while the other dev is mid-test; announce it in chat first.
-- **Join scene undecided** (dev2-tuesday.md §7, D1). If it's not decided at the Wed 10 AM check-in, cut T10 and the join scene.
+- **Join scene undecided** (dev2-tuesday.md §6, D1). If it's not decided at the Wed 10 AM check-in, cut T10 and the join scene.
 - **Dev 1 overload:** if the chat components slip past Wed 10 AM, Dev 1's Wednesday items 3–5 are cut automatically (see the ranked list).
