@@ -24,3 +24,61 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/*
+ * Krumms brand. Scoped to the .krumms wrapper (Krumms layout and the login page) so Demo Diner, a separate
+ * fictional restaurant that shares the root layout, keeps its own look. Brand blue is #2f398e from the logo.
+ */
+.krumms {
+  --k-bg: #fbf9f4;
+  --k-fg: #1c2040;
+  --k-surface: #ffffff;
+  --k-line: rgba(47, 57, 142, 0.14);
+  --k-muted: #5d6290;
+  --k-brand: #2f398e; /* buttons, fills */
+  --k-brand-contrast: #ffffff;
+  --k-brand-text: #2f398e; /* brand color used as text on the page background */
+  --k-brand-soft: #e8eaf8;
+  --k-accent: #f6c445; /* the yellow from the inspiration board */
+  --k-accent-text: #5b4300;
+  --k-danger: #c8402b;
+  --k-success: #1c7c46;
+
+  min-height: 100vh;
+  background: var(--k-bg);
+  color: var(--k-fg);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  .krumms {
+    --k-bg: #0e1030;
+    --k-fg: #eceefb;
+    --k-surface: #161a46;
+    --k-line: rgba(163, 172, 255, 0.2);
+    --k-muted: #9aa1d6;
+    --k-brand: #4a56c9;
+    --k-brand-text: #a3acff;
+    --k-brand-soft: #1f2468;
+    --k-accent-text: #f6c445;
+    --k-danger: #ff7a63;
+    --k-success: #4cc38a;
+  }
+}
+
+@theme inline {
+  --color-k-bg: var(--k-bg);
+  --color-k-fg: var(--k-fg);
+  --color-surface: var(--k-surface);
+  --color-line: var(--k-line);
+  --color-muted: var(--k-muted);
+  --color-brand: var(--k-brand);
+  --color-brand-contrast: var(--k-brand-contrast);
+  --color-brand-text: var(--k-brand-text);
+  --color-brand-soft: var(--k-brand-soft);
+  --color-accent: var(--k-accent);
+  --color-accent-text: var(--k-accent-text);
+  --color-danger: var(--k-danger);
+  --color-success: var(--k-success);
+  --font-display: var(--font-fredoka), var(--font-geist-sans), system-ui, sans-serif;
+}

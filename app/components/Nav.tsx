@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import BrandMark from "./BrandMark";
 
 const LINKS = [
   { href: "/chat", label: "Chat" },
@@ -19,12 +20,13 @@ export default function Nav({ userName }: { userName?: string }) {
   }
 
   return (
-    <header className="border-b border-black/10 dark:border-white/15">
-      <nav className="mx-auto flex max-w-5xl items-center gap-6 px-6 py-4">
-        <Link href="/" className="text-lg font-semibold tracking-tight">
-          Krumms
+    <header className="sticky top-0 z-10 border-b border-line bg-surface/90 backdrop-blur">
+      <nav className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-6 gap-y-2 px-6 py-3">
+        <Link href="/" className="flex items-center gap-2">
+          <BrandMark className="h-8 w-10" />
+          <span className="font-display text-2xl font-semibold tracking-tight text-brand-text">Krumms</span>
         </Link>
-        <ul className="flex gap-4 text-sm">
+        <ul className="flex flex-wrap gap-1 text-sm font-medium">
           {LINKS.map(({ href, label }) => {
             const active = pathname === href || pathname.startsWith(`${href}/`);
             return (
@@ -32,11 +34,9 @@ export default function Nav({ userName }: { userName?: string }) {
                 <Link
                   href={href}
                   aria-current={active ? "page" : undefined}
-                  className={
-                    active
-                      ? "font-semibold underline underline-offset-4"
-                      : "opacity-70 hover:opacity-100"
-                  }
+                  className={`rounded-full px-3.5 py-1.5 transition-colors ${
+                    active ? "bg-brand text-brand-contrast" : "text-k-fg/70 hover:bg-brand-soft hover:text-brand-text"
+                  }`}
                 >
                   {label}
                 </Link>
@@ -46,11 +46,11 @@ export default function Nav({ userName }: { userName?: string }) {
         </ul>
         {userName && (
           <div className="ml-auto flex items-center gap-3 text-sm">
-            <span className="opacity-70">{userName}</span>
+            <span className="rounded-full bg-brand-soft px-3 py-1 text-brand-text">{userName}</span>
             <button
               type="button"
               onClick={signOut}
-              className="rounded border border-black/15 px-2 py-1 hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10"
+              className="rounded-full border border-line px-3 py-1 text-muted hover:bg-brand-soft hover:text-brand-text"
             >
               Sign out
             </button>

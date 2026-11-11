@@ -1,5 +1,6 @@
 import { requireUser } from "../../../lib/auth/server";
 import { getPurchaseSummary } from "../../../lib/purchases";
+import { Badge, Card, PageHeader, StatTile } from "../../components/ui";
 
 // Query at request time, never at build time (the database is not reachable for static prerendering).
 export const dynamic = "force-dynamic";
@@ -7,53 +8,67 @@ export const dynamic = "force-dynamic";
 const usd = (cents: number) =>
   (cents / 100).toLocaleString("en-US", { style: "currency", currency: "USD" });
 
+// Program ids are slugs ("demo-diner"); show the restaurant's name. Unknown merchants already carry their own name.
+const PROGRAM_NAMES: Record<string, string> = {
+  "demo-diner": "Demo Diner",
+  starbucks: "Starbucks",
+  chipotle: "Chipotle",
+  panera: "Panera Bread",
+};
+const displayName = (merchant: string, programId: string | null) =>
+  (programId && PROGRAM_NAMES[programId]) || merchant;
+
 export default async function PurchasesPage() {
   const user = await requireUser();
   const rows = await getPurchaseSummary(user.id, 30);
   const totalCents = rows.reduce((sum, r) => sum + r.totalCents, 0);
   const visits = rows.reduce((sum, r) => sum + r.visits, 0);
+  const notEnrolled = rows.filter((r) => !r.programId).length;
 
   return (
     <section>
-      <h1 className="text-2xl font-semibold tracking-tight">Where you eat</h1>
-      <p className="mt-1 text-sm opacity-70">
-        Last 30 days from PayPal: {usd(totalCents)} across {visits} purchases.
-      </p>
+      <PageHeader title="Where you eat" subtitle="Your last 30 days of food purchases, read from PayPal." />
+
+      <div className="mb-6 flex flex-wrap gap-4">
+        <StatTile label="Spent" value={usd(totalCents)} hint="last 30 days" />
+        <StatTile label="Purchases" value={visits} />
+        <StatTile label="Restaurants" value={rows.length} />
+        <StatTile
+          label="Not enrolled"
+          value={notEnrolled}
+          hint={notEnrolled > 0 ? "no rewards program yet" : "you're in every program"}
+        />
+      </div>
 
       {rows.length === 0 ? (
-        <p className="mt-8 text-sm opacity-70">No purchases yet.</p>
+        <Card>
+          <p className="text-sm text-muted">No purchases yet.</p>
+        </Card>
       ) : (
-        <table className="mt-6 w-full text-left text-sm">
-          <thead>
-            <tr className="border-b border-black/10 dark:border-white/15">
-              <th className="py-2 pr-4 font-medium">Restaurant</th>
-              <th className="py-2 pr-4 font-medium">Visits</th>
-              <th className="py-2 pr-4 font-medium">Spend</th>
-              <th className="py-2 font-medium">Rewards</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((r) => (
-              <tr
-                key={r.merchant}
-                className="border-b border-black/5 dark:border-white/10"
-              >
-                <td className="py-2 pr-4">{r.merchant}</td>
-                <td className="py-2 pr-4">{r.visits}</td>
-                <td className="py-2 pr-4">{usd(r.totalCents)}</td>
-                <td className="py-2">
-                  {r.programId ? (
-                    <span className="opacity-70">{r.programId}</span>
-                  ) : (
-                    <span className="rounded bg-amber-500/15 px-2 py-0.5 text-amber-700 dark:text-amber-300">
-                      Not enrolled
-                    </span>
-                  )}
-                </td>
+        <Card className="overflow-x-auto p-0">
+          <table className="w-full text-left text-sm">
+            <thead>
+              <tr className="border-b border-line text-xs uppercase tracking-wide text-muted">
+                <th className="px-5 py-3 font-medium">Restaurant</th>
+                <th className="px-5 py-3 font-medium">Visits</th>
+                <th className="px-5 py-3 font-medium">Spend</th>
+                <th className="px-5 py-3 font-medium">Rewards</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {rows.map((r) => (
+                <tr key={r.merchant} className="border-b border-line last:border-0">
+                  <td className="px-5 py-3 font-medium">{displayName(r.merchant, r.programId)}</td>
+                  <td className="px-5 py-3">{r.visits}</td>
+                  <td className="px-5 py-3">{usd(r.totalCents)}</td>
+                  <td className="px-5 py-3">
+                    {r.programId ? <Badge tone="brand">Member</Badge> : <Badge tone="accent">Not enrolled</Badge>}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Card>
       )}
     </section>
   );
