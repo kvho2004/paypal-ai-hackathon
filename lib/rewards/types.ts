@@ -19,11 +19,22 @@ export interface SignUpInfo {
 
 export type SignUpResult = { ok: true } | { ok: false; reason: string };
 
+/** Thrown by an adapter when the balance page loads but its rewards data never shows. */
+export class PageNotReadyError extends Error {
+  name = "PageNotReadyError";
+}
+
 export interface RewardsAdapter {
   programId: string; // same IDs as lib/paypal/merchants.ts, e.g. "demo-diner"
   domain: string; // Kernel auth connection domain
   balanceUrl: string;
-  extract(page: Page): Promise<RawRewardsPage>; // assumes the page is already logged in
+  /**
+   * Reads the balance page in a browser that should already be logged in. Returns either the balance page once its
+   * rewards data shows, or the page the site redirected to (refresh.ts checks that URL for a login page).
+   * Throws PageNotReadyError if the data never shows: refresh.ts records that as EXTRACT_FAILED. Any other error
+   * (browser, network) is treated as temporary and thrown on for a retry.
+   */
+  extract(page: Page): Promise<RawRewardsPage>;
   signUp?(page: Page, user: SignUpInfo): Promise<SignUpResult>; // only after user approval
 }
 
