@@ -5,7 +5,7 @@ import { db } from "../db";
 
 /** Only Demo Diner can be paid in the sandbox: its app is the payee (docs/checkout.md). */
 export const CHECKOUT_PROGRAM_ID = "demo-diner";
-const MAX_AMOUNT_CENTS = 5000; // sandbox safety cap: $50
+export const MAX_AMOUNT_CENTS = 5000; // sandbox safety cap: $50
 
 export interface CreateOrderInput {
   programId: string;
