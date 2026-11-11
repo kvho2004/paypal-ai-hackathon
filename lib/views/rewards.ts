@@ -7,11 +7,16 @@ export interface RewardRow {
   programName: string;
   reward: string;
   pointCost: number;
-  balance: number; // the user's current points in this program
+  balance: number; // the user's points as of the last read of the program's site
+  /**
+   * Points the program has probably credited since that read, from Krumms purchases made after it. Always shown
+   * as "pending", never "earned": a purchase is not proof the program awarded points (dev.md section 6).
+   */
+  pendingPoints: number;
   menuValueCents: number | null; // from the catalog; null if the reward isn't catalogued
   centsPerPoint: number | null;
-  progress: number; // 0..1 = balance / pointCost
-  pointsNeeded: number; // 0 when the reward is already redeemable
+  progress: number; // 0..1 = (balance + pendingPoints) / pointCost
+  pointsNeeded: number; // 0 when the reward is redeemable with balance + pendingPoints
   expiresAt: string | null; // YYYY-MM-DD
   fetchedAt: string; // ISO timestamp of the balance read
   source: string; // "live" | "screenshot" | "manual" | "mock"
@@ -54,28 +59,56 @@ function median(values: number[]): number {
   return s.length % 2 ? s[mid] : (s[mid - 1] + s[mid]) / 2;
 }
 
+/**
+ * Points a program has probably credited for purchases made after its balance was read:
+ * the sum of floor(dollars spent x earnRate), one purchase at a time, for purchases strictly after `since`.
+ * Purchases made at or before the read are already in the balance, so they never count twice.
+ */
+export function computePendingPoints(
+  purchases: ReadonlyArray<{ amountCents: number; at: Date }>,
+  earnRate: number,
+  since: Date,
+): number {
+  if (!(earnRate > 0)) return 0;
+  return purchases
+    .filter((p) => p.at.getTime() > since.getTime())
+    .reduce((sum, p) => sum + Math.floor((p.amountCents / 100) * earnRate), 0);
+}
+
 /** Everything the rewards grid shows for a user, sorted by cents per point (best value first). */
 export async function getRewardRows(userId: string): Promise<RewardRow[]> {
   const connections = await db.connection.findMany({ where: { userId } });
   if (connections.length === 0) return [];
 
   const programIds = [...new Set(connections.map((c) => c.programId))];
-  const [programs, catalog, balances] = await Promise.all([
+  const [programs, catalog, balances, purchases] = await Promise.all([
     db.program.findMany({ where: { id: { in: programIds } } }),
     db.catalogItem.findMany({ where: { programId: { in: programIds } } }),
     db.balance.findMany({
       where: { connectionId: { in: connections.map((c) => c.id) } },
       orderBy: { fetchedAt: "desc" },
     }),
+    db.purchase.findMany({
+      where: { userId, programId: { in: programIds } },
+      select: { programId: true, amountCents: true, at: true },
+    }),
   ]);
 
   const programName = new Map(programs.map((p) => [p.id, p.name]));
+  const earnRate = new Map(programs.map((p) => [p.id, p.earnRate]));
   const menuValue = new Map(catalog.map((c) => [`${c.programId}|${norm(c.rewardName)}`, c.menuPriceCents]));
 
   const rows: RewardRow[] = [];
   for (const conn of connections) {
     const latest = balances.find((b) => b.connectionId === conn.id); // newest first
     if (!latest) continue;
+
+    const pendingPoints = computePendingPoints(
+      purchases.filter((p) => p.programId === conn.programId),
+      earnRate.get(conn.programId) ?? 0,
+      latest.fetchedAt,
+    );
+    const effectivePoints = latest.points + pendingPoints;
 
     for (const r of parseRewards(latest.rewards)) {
       const menuValueCents = menuValue.get(`${conn.programId}|${norm(r.name)}`) ?? null;
@@ -86,10 +119,11 @@ export async function getRewardRows(userId: string): Promise<RewardRow[]> {
         reward: r.name,
         pointCost: r.pointCost,
         balance: latest.points,
+        pendingPoints,
         menuValueCents,
         centsPerPoint: menuValueCents === null ? null : menuValueCents / r.pointCost,
-        progress: Math.min(latest.points / r.pointCost, 1),
-        pointsNeeded: Math.max(r.pointCost - latest.points, 0),
+        progress: Math.min(effectivePoints / r.pointCost, 1),
+        pointsNeeded: Math.max(r.pointCost - effectivePoints, 0),
         expiresAt: r.expiresAt,
         fetchedAt: latest.fetchedAt.toISOString(),
         source: latest.source,
