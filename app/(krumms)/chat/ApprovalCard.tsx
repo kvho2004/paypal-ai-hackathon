@@ -98,7 +98,7 @@ export default function ApprovalCard({
         Sandbox: no real money moves
       </p>
 
-      <div className="mt-4">
+      <div className="isolate mt-4">
         <PayPalScriptProvider options={scriptOptions}>
           <PayPalButtons
             style={{ layout: "vertical", shape: "rect" }}
