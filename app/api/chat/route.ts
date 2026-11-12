@@ -37,7 +37,7 @@ export async function POST(req: Request) {
   const result = streamText({
     model: anthropic(MODEL),
     instructions: SYSTEM_PROMPT,
-    messages: await convertToModelMessages(messages, { tools }),
+    messages: await convertToModelMessages(dropOldReasoning(messages), { tools }),
     tools,
     stopWhen: isStepCount(MAX_STEPS),
     // One tool call at a time, in the order Claude wrote them. Two preference updates can't overwrite each
@@ -58,6 +58,16 @@ export async function POST(req: Request) {
     messageMetadata: ({ part }) => (part.type === "finish" ? { finishReason: part.finishReason } : undefined),
     onError: friendlyError,
   });
+}
+
+/**
+ * Anthropic rejects a thinking block from an earlier turn ("bound to a different conversation") once a new user
+ * message follows it. Earlier turns' reasoning isn't needed, so it's dropped; the current turn keeps its own, which
+ * a tool-call continuation (the approval card's answer) sends back and the API accepts.
+ */
+function dropOldReasoning(messages: AgentUIMessage[]): AgentUIMessage[] {
+  const lastUser = messages.findLastIndex((m) => m.role === "user");
+  return messages.map((m, i) => (i < lastUser ? { ...m, parts: m.parts.filter((p) => p.type !== "reasoning") } : m));
 }
 
 /** The message the user sees in place of a raw error. Details go to the server log only. */
