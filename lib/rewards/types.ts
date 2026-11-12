@@ -79,6 +79,14 @@ export type RewardItem = z.infer<typeof RewardItemSchema>;
 export type Offer = z.infer<typeof OfferSchema>;
 export type ExtractedRewards = z.infer<typeof ExtractedRewardsSchema>;
 
+// One line of the /api/rewards/refresh stream. ConnectFlow.tsx keeps its own copy of this shape and checks each line
+// before use; keep the two in step. `status` on a failure is a RefreshResult status, or "ERROR" when the read threw.
+export type RefreshEvent =
+  | { step: "browser"; liveViewUrl: string }
+  | { step: "extracting" }
+  | { step: "done"; ok: true; points: number; rewards: number; fetchedAt: string }
+  | { step: "done"; ok: false; status: string; error: string };
+
 // Returned by refreshRewards(connectionId); used by the Render worker and the agent tool.
 export type RefreshResult =
   | { ok: true; rewards: ExtractedRewards; fetchedAt: Date }

@@ -10,13 +10,13 @@ import { PageNotReadyError, isLoginPage, type RawRewardsPage, type RefreshResult
 
 /** Progress callbacks for a caller that shows the refresh live (the /connect page). All optional. */
 export interface RefreshHooks {
-  /** The cloud browser is up; `url` is its live view. In DEMO_MODE the browser then stays open ~3 s after the read, so it can be filmed. */
+  /** The cloud browser is up; `url` is its live view. */
   onLiveView?: (url: string) => void;
   /** The page has been read; the text is now being turned into rewards. */
   onExtracting?: () => void;
+  /** Keep the browser open this long after the read, so a live view can be filmed. Default 0. */
+  holdOpenMs?: number;
 }
-
-const DEMO_HOLD_MS = 3_000;
 
 type Failure = Extract<RefreshResult, { ok: false }>;
 const fail = (status: Failure["status"], error: string): Failure => ({ ok: false, status, error });
@@ -60,9 +60,7 @@ async function readRewards(conn: Connection, adapter: RewardsAdapter, hooks: Ref
     page = await withBrowser(profileName(conn.userId, conn.programId), async (p, liveViewUrl) => {
       if (liveViewUrl) hooks.onLiveView?.(liveViewUrl);
       const read = await adapter.extract(p);
-      if (hooks.onLiveView && liveViewUrl && process.env.DEMO_MODE === "true") {
-        await new Promise((r) => setTimeout(r, DEMO_HOLD_MS));
-      }
+      if (hooks.holdOpenMs) await new Promise((r) => setTimeout(r, hooks.holdOpenMs));
       return read;
     });
   } catch (err) {

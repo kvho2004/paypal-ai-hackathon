@@ -9,12 +9,14 @@ export const dynamic = "force-dynamic";
 
 type Ctx = { params: Promise<{ program: string }> };
 
+const WAKE_TIMEOUT_MS = 45_000;
+
 /**
  * A sleeping host (Render's free tier) answers its first request with an error page, and Kernel's login would
  * record that as "website_error". One request first wakes it. Best effort: a failure here changes nothing.
  */
 async function wakeSite(url: string): Promise<void> {
-  await fetch(url, { redirect: "manual", signal: AbortSignal.timeout(45_000) }).catch(() => {});
+  await fetch(url, { redirect: "manual", signal: AbortSignal.timeout(WAKE_TIMEOUT_MS) }).catch(() => {});
 }
 
 /** POST -> { connectionId, hostedUrl }. Starts a Kernel hosted login; the user logs in there, so Krumms never sees the password. */
@@ -35,7 +37,8 @@ export async function POST(_req: Request, { params }: Ctx) {
     });
     const hostedUrl = await startLogin(auth.authId);
 
-    // One Connection per user and program: reconnecting reuses the row.
+    // One Connection per user and program: reconnecting reuses the row. Not atomic (the schema has no unique key on
+    // userId + programId), so a double-click could race and create two rows; ConnectFlow is busy while starting.
     const existing = await db.connection.findFirst({ where: { userId, programId: program } });
     const data = { kernelAuthId: auth.authId, status: "PENDING" };
     const connection = existing
@@ -48,7 +51,7 @@ export async function POST(_req: Request, { params }: Ctx) {
   }
 }
 
-/** GET ?connectionId= -> { status, error }. The page polls this while the user logs in. */
+/** GET ?connectionId= -> { status, error }. The page polls this while the user logs in. Also saves the status on the Connection. */
 export async function GET(req: Request, { params }: Ctx) {
   const userId = await getSessionUserId();
   if (!userId) return NextResponse.json({ error: "Sign in required" }, { status: 401 });
