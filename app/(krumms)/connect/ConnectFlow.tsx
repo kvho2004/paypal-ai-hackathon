@@ -3,14 +3,10 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { readNdjson } from "../../../lib/ndjson";
+import type { RefreshEvent } from "../../../lib/rewards/types";
 
 // The route contract from dev2-dev1-team-split.md. Dev 2 owns the routes; this component only consumes them.
 export type ConnectionStatus = "PENDING" | "ACTIVE" | "NEEDS_AUTH";
-export type RefreshEvent =
-  | { step: "browser"; liveViewUrl: string }
-  | { step: "extracting" }
-  | { step: "done"; ok: true; points: number; rewards: number; fetchedAt: string }
-  | { step: "done"; ok: false; status: string; error: string };
 
 export interface ConnectApi {
   start(program: string): Promise<{ connectionId: string; hostedUrl: string }>;
