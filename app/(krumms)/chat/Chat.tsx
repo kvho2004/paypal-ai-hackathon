@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type ReactNode, type SubmitEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode, type SubmitEvent } from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, isToolUIPart, type UIMessage } from "ai";
 import type { AgentUIMessage } from "../../../lib/agent/tools";
@@ -73,6 +73,12 @@ export default function Chat({ clientId, initialPrefs }: { clientId: string | nu
     return true;
   }
 
+  // The AG Grid in RankedGrid keeps the callback it first rendered with, which would carry a stale `busy` (true while
+  // the reply that created the grid was streaming) and make Order a silent no-op. Route it through a ref to the latest send.
+  const sendRef = useRef(send);
+  sendRef.current = send;
+  const orderItem = useCallback((item: string) => void sendRef.current(`Order the ${item}`), []);
+
   function onSubmit(e: SubmitEvent) {
     e.preventDefault();
     if (send(input)) setInput("");
@@ -117,7 +123,7 @@ export default function Chat({ clientId, initialPrefs }: { clientId: string | nu
             key={m.id}
             message={m}
             clientId={clientId}
-            onOrder={(item) => send(`Order the ${item}`)}
+            onOrder={orderItem}
             onApprovalResult={(toolCallId, result) =>
               void addToolOutput({ tool: "requestApproval", toolCallId, output: result })
             }
@@ -135,10 +141,10 @@ export default function Chat({ clientId, initialPrefs }: { clientId: string | nu
             )}
           </div>
         )}
-        <div ref={endRef} />
+        <div ref={endRef} className="scroll-mb-24" />
       </div>
 
-      <form onSubmit={onSubmit} className="sticky bottom-20 flex gap-2 sm:bottom-4">
+      <form onSubmit={onSubmit} className="sticky bottom-20 z-30 flex gap-2 bg-k-bg py-2 sm:bottom-0">
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
